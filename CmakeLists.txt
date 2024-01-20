@@ -6,6 +6,7 @@ project(
   LANGUAGES CXX
 )
 
+set(CMAKE_EXPORT_COMPILE_COMMANDS 1)  # clangd
 set(DAWN_FETCH_DEPENDENCIES 1)
 
 add_subdirectory(deps/glfw)
@@ -20,7 +21,6 @@ add_library(WebGPU_Tools SHARED
 target_include_directories(WebGPU_Tools PUBLIC ${PROJECT_SOURCE_DIR}/src)
 
 target_compile_definitions(WebGPU_Tools PRIVATE
-  ROOT_DIR="${CMAKE_CURRENT_SOURCE_DIR}"
   GLM_FORCE_SWIZZLE
   GLM_FORCE_DEPTH_ZERO_TO_ONE
 )
@@ -29,26 +29,3 @@ target_link_libraries(WebGPU_Tools PRIVATE
   glfw webgpu glm stb
   dawn_glfw dawncpp dawn_utils
 )
-
-set_target_properties(WebGPU_Tools PROPERTIES
-    CXX_STANDARD 20
-    CXX_STANDARD_REQUIRED YES
-    CXX_EXTENSIONS NO
-)
-
-if (MSVC)
-  target_compile_options(WebGPU_Tools PRIVATE /W4)
-else()
-  target_compile_options(WebGPU_Tools PRIVATE -Wall -Wextra -pedantic)
-  # assert in release
-  target_compile_options(WebGPU_Tools PRIVATE -UNDEBUG)
-endif()
-
-if(XCODE)
-  set_target_properties(WebGPU_Tools PROPERTIES
-      XCODE_GENERATE_SCHEME ON
-      XCODE_SCHEME_ENABLE_GPU_FRAME_CAPTURE_MODE "Metal"
-  )
-  set(CMAKE_XCODE_ATTRIBUTE_OTHER_CODE_SIGN_FLAGS "-o linker-signed")
-endif()
-
