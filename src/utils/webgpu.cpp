@@ -1,11 +1,10 @@
-#include "utils/webgpu.hpp"
+#include "webgpu.hpp"
 #include "dawn/utils/WGPUHelpers.h"
 #include <iostream>
 #include <fstream>
 #include <sstream>
 
-namespace util {
-// using namespace util;
+namespace utils {
 
 using namespace wgpu;
 
@@ -188,7 +187,7 @@ wgpu::Texture CreateRenderTexture(
   return device.CreateTexture(&textureDesc);
 }
 
-util::RenderPassDescriptor::RenderPassDescriptor(
+RenderPassDescriptor::RenderPassDescriptor(
   std::vector<wgpu::RenderPassColorAttachment> colorAttachments,
   wgpu::RenderPassDepthStencilAttachment depthStencilAttachment
 )
@@ -227,5 +226,5 @@ const RenderPassDescriptor &RenderPassDescriptor::operator=(
   return *this;
 }
 
-} // namespace util
+} // namespace utils
 

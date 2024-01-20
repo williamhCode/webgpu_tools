@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.0...3.25)
+cmake_minimum_required(VERSION 3.0...3.28)
 
 project(
   WebGPU_Tools
@@ -6,31 +6,36 @@ project(
   LANGUAGES CXX
 )
 
-set(CMAKE_EXPORT_COMPILE_COMMANDS 1)  # clangd
-set(DAWN_FETCH_DEPENDENCIES 1)
+set(DAWN_FETCH_DEPENDENCIES ON)
 
 add_subdirectory(deps/glfw)
 add_subdirectory(deps/webgpu)
 add_subdirectory(deps/glm)
 add_subdirectory(deps/stb)
 
-add_library(WebGPU_Tools SHARED
+add_library(WebGPU_Tools STATIC
   src/utils/webgpu.cpp
 )
 
 set_target_properties(WebGPU_Tools PROPERTIES
   CXX_STANDARD 20
-  CXX_STANDARD_REQUIRED YES
+  CXX_STANDARD_REQUIRED ON
 )
 
-target_include_directories(WebGPU_Tools PUBLIC ${PROJECT_SOURCE_DIR}/src)
+target_include_directories(
+  WebGPU_Tools PUBLIC
+  ${PROJECT_SOURCE_DIR}/src
+  # ${PROJECT_SOURCE_DIR}/deps/stb
+  # ${PROJECT_SOURCE_DIR}/deps/glm
+  # ${PROJECT_SOURCE_DIR}/deps/glfw/include
+)
 
-target_compile_definitions(WebGPU_Tools PRIVATE
+target_compile_definitions(WebGPU_Tools PUBLIC
   GLM_FORCE_SWIZZLE
   GLM_FORCE_DEPTH_ZERO_TO_ONE
 )
 
-target_link_libraries(WebGPU_Tools PRIVATE 
+target_link_libraries(WebGPU_Tools PUBLIC
   glfw webgpu glm stb
   dawn_glfw dawncpp dawn_utils
 )

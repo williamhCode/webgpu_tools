@@ -4,7 +4,7 @@
 #include <vector>
 #include <webgpu/webgpu_cpp.h>
 
-namespace util {
+namespace utils {
 
 namespace fs = std::filesystem;
 
@@ -58,7 +58,7 @@ const wgpu::BlendState AlphaBlending = {
 };
 }
 
-} // namespace util
+} // namespace utils
 
 template <typename T>
 const T *ToPtr(const T &&value) {
