@@ -15,7 +15,12 @@ add_subdirectory(deps/glm)
 add_subdirectory(deps/stb)
 
 add_library(WebGPU_Tools SHARED
-    src/utils/webgpu.cpp
+  src/utils/webgpu.cpp
+)
+
+set_target_properties(WebGPU_Tools PROPERTIES
+  CXX_STANDARD 20
+  CXX_STANDARD_REQUIRED YES
 )
 
 target_include_directories(WebGPU_Tools PUBLIC ${PROJECT_SOURCE_DIR}/src)

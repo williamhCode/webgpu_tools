@@ -1,4 +1,4 @@
-#include "webgpu-util.hpp"
+#include "utils/webgpu.hpp"
 #include "dawn/utils/WGPUHelpers.h"
 #include <iostream>
 #include <fstream>
@@ -9,7 +9,7 @@ namespace util {
 
 using namespace wgpu;
 
-Adapter RequestAdapter(Instance &instance, RequestAdapterOptions const *options) {
+Adapter RequestAdapter(const Instance &instance, RequestAdapterOptions const *options) {
   struct UserData {
     WGPUAdapter adapter = nullptr;
     bool requestEnded = false;
@@ -36,7 +36,7 @@ Adapter RequestAdapter(Instance &instance, RequestAdapterOptions const *options)
   return userData.adapter;
 }
 
-Device RequestDevice(Adapter &instance, DeviceDescriptor const *descriptor) {
+Device RequestDevice(const Adapter &instance, DeviceDescriptor const *descriptor) {
   struct UserData {
     WGPUDevice device = nullptr;
     bool requestEnded = false;
@@ -63,7 +63,7 @@ Device RequestDevice(Adapter &instance, DeviceDescriptor const *descriptor) {
   return userData.device;
 }
 
-void SetUncapturedErrorCallback(Device &device) {
+void SetUncapturedErrorCallback(const Device &device) {
   auto onUncapturedError = [](WGPUErrorType type, char const *message, void *userdata) {
     std::cout << "Device error: type " << type;
     if (message) std::cout << " (message: " << message << ")";
@@ -73,7 +73,7 @@ void SetUncapturedErrorCallback(Device &device) {
   device.SetUncapturedErrorCallback(onUncapturedError, nullptr);
 }
 
-ShaderModule LoadShaderModule(const fs::path &path, Device &device) {
+ShaderModule LoadShaderModule(const Device &device, const fs::path &path) {
   std::ifstream file(path);
   if (!file.is_open()) {
     throw std::runtime_error("Could not open shader file" + path.string());
@@ -85,7 +85,7 @@ ShaderModule LoadShaderModule(const fs::path &path, Device &device) {
 }
 
 // clang-format off
-void PrintLimits(wgpu::Limits const &limits) {
+void PrintLimits(const wgpu::Limits &limits) {
   std::cout << " - maxTextureDimension1D: " << limits.maxTextureDimension1D << "\n";
   std::cout << " - maxTextureDimension2D: " << limits.maxTextureDimension2D << "\n";
   std::cout << " - maxTextureDimension3D: " << limits.maxTextureDimension3D << "\n";
@@ -122,7 +122,7 @@ void PrintLimits(wgpu::Limits const &limits) {
 // clang-format on
 
 wgpu::Buffer CreateBuffer(
-  wgpu::Device &device, wgpu::BufferUsage usage, size_t size, const void *data
+  const wgpu::Device &device, wgpu::BufferUsage usage, size_t size, const void *data
 ) {
   BufferDescriptor bufferDesc{
     .usage = BufferUsage::CopyDst | usage,
@@ -133,24 +133,24 @@ wgpu::Buffer CreateBuffer(
   return buffer;
 }
 
-wgpu::Buffer CreateVertexBuffer(wgpu::Device &device, size_t size, const void *data) {
+wgpu::Buffer CreateVertexBuffer(const wgpu::Device &device, size_t size, const void *data) {
   return CreateBuffer(device, BufferUsage::Vertex, size, data);
 }
 
-wgpu::Buffer CreateIndexBuffer(wgpu::Device &device, size_t size, const void *data) {
+wgpu::Buffer CreateIndexBuffer(const wgpu::Device &device, size_t size, const void *data) {
   return CreateBuffer(device, BufferUsage::Index, size, data);
 }
 
-wgpu::Buffer CreateUniformBuffer(wgpu::Device &device, size_t size, const void *data) {
+wgpu::Buffer CreateUniformBuffer(const wgpu::Device &device, size_t size, const void *data) {
   return CreateBuffer(device, BufferUsage::Uniform, size, data);
 }
 
-wgpu::Buffer CreateStorageBuffer(wgpu::Device &device, size_t size, const void *data) {
+wgpu::Buffer CreateStorageBuffer(const wgpu::Device &device, size_t size, const void *data) {
   return CreateBuffer(device, BufferUsage::Storage, size, data);
 }
 
 wgpu::Texture CreateTexture(
-  wgpu::Device &device,
+  const wgpu::Device &device,
   wgpu::Extent3D size,
   wgpu::TextureFormat format,
   const void *data
@@ -178,7 +178,7 @@ wgpu::Texture CreateTexture(
 }
 
 wgpu::Texture CreateRenderTexture(
-  wgpu::Device &device, wgpu::Extent3D size, wgpu::TextureFormat format
+  const wgpu::Device &device, wgpu::Extent3D size, wgpu::TextureFormat format
 ) {
   TextureDescriptor textureDesc{
     .usage = TextureUsage::RenderAttachment | TextureUsage::TextureBinding,
