@@ -25,9 +25,6 @@ set_target_properties(WebGPU_Tools PROPERTIES
 target_include_directories(
   WebGPU_Tools PUBLIC
   ${PROJECT_SOURCE_DIR}/src
-  # ${PROJECT_SOURCE_DIR}/deps/stb
-  # ${PROJECT_SOURCE_DIR}/deps/glm
-  # ${PROJECT_SOURCE_DIR}/deps/glfw/include
 )
 
 target_compile_definitions(WebGPU_Tools PUBLIC
