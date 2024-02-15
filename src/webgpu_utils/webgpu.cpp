@@ -4,7 +4,7 @@
 #include <fstream>
 #include <sstream>
 
-namespace utils {
+namespace wgpu::utils {
 
 using namespace wgpu;
 

@@ -63,7 +63,6 @@ if (NOT dawn_POPULATED)
 endif ()
 
 set(AllDawnTargets
-  core_tables
   dawn_common
   dawn_glfw
   dawn_headers

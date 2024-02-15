@@ -4,7 +4,7 @@
 #include <vector>
 #include <webgpu/webgpu_cpp.h>
 
-namespace utils {
+namespace wgpu::utils {
 
 namespace fs = std::filesystem;
 

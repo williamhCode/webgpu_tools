@@ -13,8 +13,9 @@ add_subdirectory(deps/webgpu)
 add_subdirectory(deps/glm)
 add_subdirectory(deps/stb)
 
+
 add_library(WebGPU_Tools STATIC
-  src/utils/webgpu.cpp
+  src/webgpu_utils/webgpu.cpp
 )
 
 set_target_properties(WebGPU_Tools PROPERTIES
@@ -33,6 +34,6 @@ target_compile_definitions(WebGPU_Tools PUBLIC
 )
 
 target_link_libraries(WebGPU_Tools PUBLIC
-  glfw webgpu glm stb
-  dawn_glfw dawncpp dawn_utils
+  glfw glm stb
+  webgpu dawn_glfw dawncpp dawn_utils
 )
