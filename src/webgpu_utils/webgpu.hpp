@@ -1,8 +1,9 @@
 #pragma once
 
+#include <webgpu/webgpu_cpp.h>
+#include "dawn/utils/WGPUHelpers.h"
 #include <filesystem>
 #include <vector>
-#include <webgpu/webgpu_cpp.h>
 
 namespace wgpu::utils {
 
@@ -41,6 +42,20 @@ struct RenderPassDescriptor : public wgpu::RenderPassDescriptor{
   std::vector<wgpu::RenderPassColorAttachment> cColorAttachments;
   wgpu::RenderPassDepthStencilAttachment cDepthStencilAttachmentInfo = {};
 };
+
+struct VertexBufferLayout : public wgpu::VertexBufferLayout {
+  VertexBufferLayout(
+    uint64_t arrayStride,
+    std::vector<wgpu::VertexAttribute> attributes,
+    VertexStepMode stepMode = VertexStepMode::Vertex
+  );
+  ~VertexBufferLayout() = default;
+
+  VertexBufferLayout(const VertexBufferLayout& other);
+  const VertexBufferLayout& operator=(const VertexBufferLayout& other);
+
+  std::vector<wgpu::VertexAttribute> cAttributes;
+};
 // clang-format on
 
 namespace BlendState {
@@ -57,6 +72,11 @@ const wgpu::BlendState AlphaBlending = {
   },
 };
 }
+
+// useful dawn utils
+using dawn::utils::MakeBindGroup;
+using dawn::utils::MakeBindGroupLayout;
+using dawn::utils::MakePipelineLayout;
 
 } // namespace utils
 

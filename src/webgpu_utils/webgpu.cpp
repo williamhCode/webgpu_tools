@@ -1,5 +1,4 @@
 #include "webgpu.hpp"
-#include "dawn/utils/WGPUHelpers.h"
 #include <iostream>
 #include <fstream>
 #include <sstream>
@@ -223,6 +222,30 @@ const RenderPassDescriptor &RenderPassDescriptor::operator=(
     depthStencilAttachment = nullptr;
   }
 
+  return *this;
+}
+
+VertexBufferLayout::VertexBufferLayout(
+    uint64_t arrayStride,
+    std::vector<wgpu::VertexAttribute> attributes,
+    VertexStepMode stepMode
+  ) : cAttributes(std::move(attributes)) {
+  this->arrayStride = arrayStride;
+  this->stepMode = stepMode;
+  attributeCount = cAttributes.size();
+  this->attributes = cAttributes.data();
+}
+
+VertexBufferLayout::VertexBufferLayout(const VertexBufferLayout &other) {
+  *this = other;
+}
+
+const VertexBufferLayout &VertexBufferLayout::operator=(const VertexBufferLayout &other) {
+  cAttributes = other.cAttributes;
+  arrayStride = other.arrayStride;
+  stepMode = other.stepMode;
+  attributeCount = other.attributeCount;
+  attributes = cAttributes.data();
   return *this;
 }
 
