@@ -1,6 +1,6 @@
 #pragma once
 
-#include <webgpu/webgpu_cpp.h>
+#include "webgpu/webgpu_cpp.h"
 #include "dawn/utils/WGPUHelpers.h"
 #include <filesystem>
 #include <vector>
