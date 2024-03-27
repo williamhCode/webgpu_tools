@@ -26,8 +26,9 @@ wgpu::Buffer CreateIndexBuffer(const wgpu::Device &device, size_t size, const vo
 wgpu::Buffer CreateUniformBuffer(const wgpu::Device &device, size_t size, const void *data = nullptr);
 wgpu::Buffer CreateStorageBuffer(const wgpu::Device &device, size_t size, const void *data = nullptr);
 
-wgpu::Texture CreateTexture(const wgpu::Device &device, wgpu::Extent3D size, wgpu::TextureFormat format, const void *data = nullptr);
-wgpu::Texture CreateRenderTexture(const wgpu::Device &device, wgpu::Extent3D size, wgpu::TextureFormat format);
+wgpu::Texture CreateTexture(const wgpu::Device& device, wgpu::TextureUsage usage, wgpu::Extent3D size, wgpu::TextureFormat format, const void* data);
+wgpu::Texture CreateBindingTexture(const wgpu::Device &device, wgpu::Extent3D size, wgpu::TextureFormat format, const void *data = nullptr);
+wgpu::Texture CreateRenderTexture(const wgpu::Device &device, wgpu::Extent3D size, wgpu::TextureFormat format, const void *data = nullptr);
 
 struct RenderPassDescriptor : public wgpu::RenderPassDescriptor{
   RenderPassDescriptor(
@@ -78,15 +79,14 @@ using dawn::utils::MakeBindGroup;
 using dawn::utils::MakeBindGroupLayout;
 using dawn::utils::MakePipelineLayout;
 
-} // namespace utils
+} // namespace wgpu::utils
 
 template <typename T>
-const T *ToPtr(const T &&value) {
+const T* ToPtr(const T&& value) {
   return &value;
 }
 
 template <typename T, size_t N>
-constexpr const T *ToPtr(const T (&&a)[N]) {
+constexpr const T* ToPtr(const T (&&a)[N]) {
   return a;
 }
-

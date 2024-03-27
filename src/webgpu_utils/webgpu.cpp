@@ -7,7 +7,7 @@ namespace wgpu::utils {
 
 using namespace wgpu;
 
-Adapter RequestAdapter(const Instance &instance, RequestAdapterOptions const *options) {
+Adapter RequestAdapter(const Instance& instance, RequestAdapterOptions const* options) {
   struct UserData {
     WGPUAdapter adapter = nullptr;
     bool requestEnded = false;
@@ -16,9 +16,9 @@ Adapter RequestAdapter(const Instance &instance, RequestAdapterOptions const *op
 
   auto onAdapterRequestEnded = [](
                                  WGPURequestAdapterStatus status, WGPUAdapter adapter,
-                                 char const *message, void *pUserData
+                                 char const* message, void* pUserData
                                ) {
-    UserData &userData = *reinterpret_cast<UserData *>(pUserData);
+    UserData& userData = *reinterpret_cast<UserData*>(pUserData);
     if (status == WGPURequestAdapterStatus_Success) {
       userData.adapter = adapter;
     } else {
@@ -34,7 +34,7 @@ Adapter RequestAdapter(const Instance &instance, RequestAdapterOptions const *op
   return userData.adapter;
 }
 
-Device RequestDevice(const Adapter &instance, DeviceDescriptor const *descriptor) {
+Device RequestDevice(const Adapter& instance, DeviceDescriptor const* descriptor) {
   struct UserData {
     WGPUDevice device = nullptr;
     bool requestEnded = false;
@@ -43,9 +43,9 @@ Device RequestDevice(const Adapter &instance, DeviceDescriptor const *descriptor
 
   auto onDeviceRequestEnded = [](
                                 WGPURequestDeviceStatus status, WGPUDevice device,
-                                char const *message, void *pUserData
+                                char const* message, void* pUserData
                               ) {
-    UserData &userData = *reinterpret_cast<UserData *>(pUserData);
+    UserData& userData = *reinterpret_cast<UserData*>(pUserData);
     if (status == WGPURequestDeviceStatus_Success) {
       userData.device = device;
     } else {
@@ -61,8 +61,8 @@ Device RequestDevice(const Adapter &instance, DeviceDescriptor const *descriptor
   return userData.device;
 }
 
-void SetUncapturedErrorCallback(const Device &device) {
-  auto onUncapturedError = [](WGPUErrorType type, char const *message, void *userdata) {
+void SetUncapturedErrorCallback(const Device& device) {
+  auto onUncapturedError = [](WGPUErrorType type, char const* message, void* userdata) {
     std::cout << "Device error: type " << type;
     if (message) std::cout << " (message: " << message << ")";
     std::cout << std::endl;
@@ -71,7 +71,7 @@ void SetUncapturedErrorCallback(const Device &device) {
   device.SetUncapturedErrorCallback(onUncapturedError, nullptr);
 }
 
-ShaderModule LoadShaderModule(const Device &device, const fs::path &path) {
+ShaderModule LoadShaderModule(const Device& device, const fs::path& path) {
   std::ifstream file(path);
   if (!file.is_open()) {
     throw std::runtime_error("Could not open shader file" + path.string());
@@ -119,9 +119,7 @@ void PrintLimits(const wgpu::Limits &limits) {
 }
 // clang-format on
 
-wgpu::Buffer CreateBuffer(
-  const wgpu::Device &device, wgpu::BufferUsage usage, size_t size, const void *data
-) {
+wgpu::Buffer CreateBuffer(const wgpu::Device& device, wgpu::BufferUsage usage, size_t size, const void* data) {
   BufferDescriptor bufferDesc{
     .usage = BufferUsage::CopyDst | usage,
     .size = size,
@@ -131,30 +129,31 @@ wgpu::Buffer CreateBuffer(
   return buffer;
 }
 
-wgpu::Buffer CreateVertexBuffer(const wgpu::Device &device, size_t size, const void *data) {
+wgpu::Buffer CreateVertexBuffer(const wgpu::Device& device, size_t size, const void* data) {
   return CreateBuffer(device, BufferUsage::Vertex, size, data);
 }
 
-wgpu::Buffer CreateIndexBuffer(const wgpu::Device &device, size_t size, const void *data) {
+wgpu::Buffer CreateIndexBuffer(const wgpu::Device& device, size_t size, const void* data) {
   return CreateBuffer(device, BufferUsage::Index, size, data);
 }
 
-wgpu::Buffer CreateUniformBuffer(const wgpu::Device &device, size_t size, const void *data) {
+wgpu::Buffer CreateUniformBuffer(const wgpu::Device& device, size_t size, const void* data) {
   return CreateBuffer(device, BufferUsage::Uniform, size, data);
 }
 
-wgpu::Buffer CreateStorageBuffer(const wgpu::Device &device, size_t size, const void *data) {
+wgpu::Buffer CreateStorageBuffer(const wgpu::Device& device, size_t size, const void* data) {
   return CreateBuffer(device, BufferUsage::Storage, size, data);
 }
 
 wgpu::Texture CreateTexture(
-  const wgpu::Device &device,
+  const wgpu::Device& device,
+  wgpu::TextureUsage usage,
   wgpu::Extent3D size,
   wgpu::TextureFormat format,
-  const void *data
+  const void* data
 ) {
   TextureDescriptor textureDesc{
-    .usage = TextureUsage::TextureBinding | TextureUsage::CopyDst,
+    .usage = TextureUsage::CopyDst | usage,
     .size = size,
     .format = format,
   };
@@ -175,15 +174,22 @@ wgpu::Texture CreateTexture(
   return texture;
 }
 
-wgpu::Texture CreateRenderTexture(
-  const wgpu::Device &device, wgpu::Extent3D size, wgpu::TextureFormat format
+wgpu::Texture CreateBindingTexture(
+  const wgpu::Device& device,
+  wgpu::Extent3D size,
+  wgpu::TextureFormat format,
+  const void* data
 ) {
-  TextureDescriptor textureDesc{
-    .usage = TextureUsage::RenderAttachment | TextureUsage::TextureBinding,
-    .size = size,
-    .format = format,
-  };
-  return device.CreateTexture(&textureDesc);
+  return CreateTexture(device, TextureUsage::TextureBinding, size, format, data);
+}
+
+wgpu::Texture CreateRenderTexture(
+  const wgpu::Device& device,
+  wgpu::Extent3D size,
+  wgpu::TextureFormat format,
+  const void* data
+) {
+  return CreateTexture(device, TextureUsage::RenderAttachment | TextureUsage::TextureBinding, size, format, data);
 }
 
 RenderPassDescriptor::RenderPassDescriptor(
@@ -202,13 +208,12 @@ RenderPassDescriptor::RenderPassDescriptor(
   }
 }
 
-RenderPassDescriptor::RenderPassDescriptor(const RenderPassDescriptor &other) {
+RenderPassDescriptor::RenderPassDescriptor(const RenderPassDescriptor& other) {
   *this = other;
 }
 
-const RenderPassDescriptor &RenderPassDescriptor::operator=(
-  const RenderPassDescriptor &otherRenderPass
-) {
+const RenderPassDescriptor&
+RenderPassDescriptor::operator=(const RenderPassDescriptor& otherRenderPass) {
   cDepthStencilAttachmentInfo = otherRenderPass.cDepthStencilAttachmentInfo;
   cColorAttachments = otherRenderPass.cColorAttachments;
   colorAttachmentCount = otherRenderPass.colorAttachmentCount;
@@ -226,21 +231,23 @@ const RenderPassDescriptor &RenderPassDescriptor::operator=(
 }
 
 VertexBufferLayout::VertexBufferLayout(
-    uint64_t arrayStride,
-    std::vector<wgpu::VertexAttribute> attributes,
-    VertexStepMode stepMode
-  ) : cAttributes(std::move(attributes)) {
+  uint64_t arrayStride,
+  std::vector<wgpu::VertexAttribute> attributes,
+  VertexStepMode stepMode
+)
+    : cAttributes(std::move(attributes)) {
   this->arrayStride = arrayStride;
   this->stepMode = stepMode;
   attributeCount = cAttributes.size();
   this->attributes = cAttributes.data();
 }
 
-VertexBufferLayout::VertexBufferLayout(const VertexBufferLayout &other) {
+VertexBufferLayout::VertexBufferLayout(const VertexBufferLayout& other) {
   *this = other;
 }
 
-const VertexBufferLayout &VertexBufferLayout::operator=(const VertexBufferLayout &other) {
+const VertexBufferLayout& VertexBufferLayout::operator=(const VertexBufferLayout& other
+) {
   cAttributes = other.cAttributes;
   arrayStride = other.arrayStride;
   stepMode = other.stepMode;
@@ -249,5 +256,4 @@ const VertexBufferLayout &VertexBufferLayout::operator=(const VertexBufferLayout
   return *this;
 }
 
-} // namespace utils
-
+} // namespace wgpu::utils
