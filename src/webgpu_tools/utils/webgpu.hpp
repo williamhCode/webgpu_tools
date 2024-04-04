@@ -7,8 +7,6 @@
 
 namespace wgpu::utils {
 
-namespace fs = std::filesystem;
-
 // clang-format off
 wgpu::Adapter RequestAdapter(const wgpu::Instance &instance, const wgpu::RequestAdapterOptions *options);
 
@@ -16,7 +14,7 @@ wgpu::Device RequestDevice(const wgpu::Adapter &instance, const wgpu::DeviceDesc
 
 void SetUncapturedErrorCallback(const wgpu::Device &device);
 
-wgpu::ShaderModule LoadShaderModule(const wgpu::Device &device, const fs::path &path);
+wgpu::ShaderModule LoadShaderModule(const wgpu::Device &device, const std::filesystem::path &path);
 
 void PrintLimits(wgpu::Limits const &limits);
 

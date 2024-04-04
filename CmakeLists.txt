@@ -15,7 +15,7 @@ add_subdirectory(deps/stb)
 
 
 add_library(WebGPU_Tools STATIC
-  src/webgpu_utils/webgpu.cpp
+  src/webgpu_tools/utils/webgpu.cpp
 )
 
 set_target_properties(WebGPU_Tools PROPERTIES

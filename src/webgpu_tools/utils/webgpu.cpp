@@ -71,7 +71,7 @@ void SetUncapturedErrorCallback(const Device& device) {
   device.SetUncapturedErrorCallback(onUncapturedError, nullptr);
 }
 
-ShaderModule LoadShaderModule(const Device& device, const fs::path& path) {
+ShaderModule LoadShaderModule(const Device& device, const std::filesystem::path& path) {
   std::ifstream file(path);
   if (!file.is_open()) {
     throw std::runtime_error("Could not open shader file" + path.string());
