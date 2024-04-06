@@ -18,11 +18,11 @@ Adapter RequestAdapter(const Instance& instance, RequestAdapterOptions const* op
                                  WGPURequestAdapterStatus status, WGPUAdapter adapter,
                                  char const* message, void* pUserData
                                ) {
-    UserData& userData = *reinterpret_cast<UserData*>(pUserData);
+    UserData& userData = *static_cast<UserData*>(pUserData);
     if (status == WGPURequestAdapterStatus_Success) {
       userData.adapter = adapter;
     } else {
-      std::cout << "Could not get WebGPU adapter: " << message << std::endl;
+      std::cout << "Could not get WebGPU adapter: " << message << "\n";
     }
     userData.requestEnded = true;
   };
@@ -45,11 +45,11 @@ Device RequestDevice(const Adapter& instance, DeviceDescriptor const* descriptor
                                 WGPURequestDeviceStatus status, WGPUDevice device,
                                 char const* message, void* pUserData
                               ) {
-    UserData& userData = *reinterpret_cast<UserData*>(pUserData);
+    UserData& userData = *static_cast<UserData*>(pUserData);
     if (status == WGPURequestDeviceStatus_Success) {
       userData.device = device;
     } else {
-      std::cout << "Could not get WebGPU adapter: " << message << std::endl;
+      std::cout << "Could not get WebGPU adapter: " << message << "\n";
     }
     userData.requestEnded = true;
   };
@@ -65,7 +65,7 @@ void SetUncapturedErrorCallback(const Device& device) {
   auto onUncapturedError = [](WGPUErrorType type, char const* message, void* userdata) {
     std::cout << "Device error: type " << type;
     if (message) std::cout << " (message: " << message << ")";
-    std::cout << std::endl;
+    std::cout << "\n";
   };
 
   device.SetUncapturedErrorCallback(onUncapturedError, nullptr);
@@ -195,8 +195,7 @@ wgpu::Texture CreateRenderTexture(
 RenderPassDescriptor::RenderPassDescriptor(
   std::vector<wgpu::RenderPassColorAttachment> colorAttachments,
   wgpu::RenderPassDepthStencilAttachment depthStencilAttachment
-)
-    : cColorAttachments(std::move(colorAttachments)) {
+) : cColorAttachments(std::move(colorAttachments)) {
   colorAttachmentCount = cColorAttachments.size();
   this->colorAttachments = cColorAttachments.data();
 
@@ -212,8 +211,7 @@ RenderPassDescriptor::RenderPassDescriptor(const RenderPassDescriptor& other) {
   *this = other;
 }
 
-const RenderPassDescriptor&
-RenderPassDescriptor::operator=(const RenderPassDescriptor& otherRenderPass) {
+RenderPassDescriptor& RenderPassDescriptor::operator=(const RenderPassDescriptor& otherRenderPass) {
   cDepthStencilAttachmentInfo = otherRenderPass.cDepthStencilAttachmentInfo;
   cColorAttachments = otherRenderPass.cColorAttachments;
   colorAttachmentCount = otherRenderPass.colorAttachmentCount;
@@ -234,8 +232,7 @@ VertexBufferLayout::VertexBufferLayout(
   uint64_t arrayStride,
   std::vector<wgpu::VertexAttribute> attributes,
   VertexStepMode stepMode
-)
-    : cAttributes(std::move(attributes)) {
+) : cAttributes(std::move(attributes)) {
   this->arrayStride = arrayStride;
   this->stepMode = stepMode;
   attributeCount = cAttributes.size();
@@ -246,7 +243,7 @@ VertexBufferLayout::VertexBufferLayout(const VertexBufferLayout& other) {
   *this = other;
 }
 
-const VertexBufferLayout& VertexBufferLayout::operator=(const VertexBufferLayout& other
+VertexBufferLayout& VertexBufferLayout::operator=(const VertexBufferLayout& other
 ) {
   cAttributes = other.cAttributes;
   arrayStride = other.arrayStride;

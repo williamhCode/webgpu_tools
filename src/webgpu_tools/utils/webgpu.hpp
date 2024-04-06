@@ -10,7 +10,7 @@ namespace wgpu::utils {
 // clang-format off
 wgpu::Adapter RequestAdapter(const wgpu::Instance &instance, const wgpu::RequestAdapterOptions *options);
 
-wgpu::Device RequestDevice(const wgpu::Adapter &instance, const wgpu::DeviceDescriptor *options);
+wgpu::Device RequestDevice(const wgpu::Adapter &instance, const wgpu::DeviceDescriptor *descriptor);
 
 void SetUncapturedErrorCallback(const wgpu::Device &device);
 
@@ -31,12 +31,12 @@ wgpu::Texture CreateRenderTexture(const wgpu::Device &device, wgpu::Extent3D siz
 struct RenderPassDescriptor : public wgpu::RenderPassDescriptor{
   RenderPassDescriptor(
     std::vector<wgpu::RenderPassColorAttachment> colorAttachments = {},
-    wgpu::RenderPassDepthStencilAttachment depthStencilAttachment = wgpu::RenderPassDepthStencilAttachment{}
+    wgpu::RenderPassDepthStencilAttachment depthStencilAttachment = {}
   );
   ~RenderPassDescriptor() = default;
 
   RenderPassDescriptor(const RenderPassDescriptor& otherRenderPass);
-  const RenderPassDescriptor& operator=(const RenderPassDescriptor& otherRenderPass);
+  RenderPassDescriptor& operator=(const RenderPassDescriptor& otherRenderPass);
 
   std::vector<wgpu::RenderPassColorAttachment> cColorAttachments;
   wgpu::RenderPassDepthStencilAttachment cDepthStencilAttachmentInfo = {};
@@ -51,7 +51,7 @@ struct VertexBufferLayout : public wgpu::VertexBufferLayout {
   ~VertexBufferLayout() = default;
 
   VertexBufferLayout(const VertexBufferLayout& other);
-  const VertexBufferLayout& operator=(const VertexBufferLayout& other);
+  VertexBufferLayout& operator=(const VertexBufferLayout& other);
 
   std::vector<wgpu::VertexAttribute> cAttributes;
 };
