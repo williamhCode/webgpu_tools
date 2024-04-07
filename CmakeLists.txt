@@ -1,9 +1,9 @@
-cmake_minimum_required(VERSION 3.0...3.28)
+cmake_minimum_required(VERSION 3.5...3.28)
 
 project(
   WebGPU_Tools
   VERSION 1.0
-  LANGUAGES CXX
+  LANGUAGES C CXX
 )
 
 set(DAWN_FETCH_DEPENDENCIES ON)
@@ -14,20 +14,12 @@ add_subdirectory(deps/glm)
 add_subdirectory(deps/stb)
 
 # sdl3 test
-option(VENDORED "Use vendored libraries" ON)
-if(VENDORED)
-    # This assumes you have added SDL as a submodule in vendored/SDL
-    add_subdirectory(deps/SDL3-3.1.1 EXCLUDE_FROM_ALL)
-else()
-    # 1. Look for a SDL3 package,
-    # 2. look for the SDL3-shared component, and
-    # 3. fail if the shared component cannot be found.
-    find_package(SDL3 REQUIRED CONFIG REQUIRED COMPONENTS SDL3-shared)
-endif()
-
+add_subdirectory(deps/SDL3-3.1.1)
+# find_package(SDL3 REQUIRED CONFIG REQUIRED COMPONENTS SDL3-shared)
 
 add_library(WebGPU_Tools STATIC
   src/webgpu_tools/utils/webgpu.cpp
+  src/webgpu_tools/utils/sdl3webgpu.m
 )
 
 set_target_properties(WebGPU_Tools PROPERTIES
@@ -47,7 +39,7 @@ target_compile_definitions(WebGPU_Tools PUBLIC
 
 target_link_libraries(WebGPU_Tools PUBLIC
   SDL3::SDL3
-  # glfw
+  glfw
   glm stb
   webgpu dawn_glfw dawncpp dawn_utils
 )
