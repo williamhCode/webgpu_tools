@@ -8,12 +8,10 @@ project(
 
 set(DAWN_FETCH_DEPENDENCIES ON)
 
-add_subdirectory(deps/glfw)
+# add_subdirectory(deps/glfw)
 add_subdirectory(deps/webgpu)
 add_subdirectory(deps/glm)
 add_subdirectory(deps/stb)
-
-# sdl3 test
 add_subdirectory(deps/SDL3-3.1.1)
 # find_package(SDL3 REQUIRED CONFIG REQUIRED COMPONENTS SDL3-shared)
 
@@ -39,7 +37,7 @@ target_compile_definitions(WebGPU_Tools PUBLIC
 
 target_link_libraries(WebGPU_Tools PUBLIC
   SDL3::SDL3
-  glfw
+  # glfw
   glm stb
   webgpu dawn_glfw dawncpp dawn_utils
 )
