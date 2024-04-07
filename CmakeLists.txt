@@ -13,6 +13,18 @@ add_subdirectory(deps/webgpu)
 add_subdirectory(deps/glm)
 add_subdirectory(deps/stb)
 
+# sdl3 test
+option(VENDORED "Use vendored libraries" ON)
+if(VENDORED)
+    # This assumes you have added SDL as a submodule in vendored/SDL
+    add_subdirectory(deps/SDL3-3.1.1 EXCLUDE_FROM_ALL)
+else()
+    # 1. Look for a SDL3 package,
+    # 2. look for the SDL3-shared component, and
+    # 3. fail if the shared component cannot be found.
+    find_package(SDL3 REQUIRED CONFIG REQUIRED COMPONENTS SDL3-shared)
+endif()
+
 
 add_library(WebGPU_Tools STATIC
   src/webgpu_tools/utils/webgpu.cpp
@@ -34,6 +46,8 @@ target_compile_definitions(WebGPU_Tools PUBLIC
 )
 
 target_link_libraries(WebGPU_Tools PUBLIC
-  glfw glm stb
+  SDL3::SDL3
+  # glfw
+  glm stb
   webgpu dawn_glfw dawncpp dawn_utils
 )
