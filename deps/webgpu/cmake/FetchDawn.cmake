@@ -158,6 +158,4 @@ foreach (Target ${AllDawnTargets})
   endif()
 endforeach()
 
-# This is likely needed for other targets as well
-# TODO: Notify this upstream (is this still needed?)
-target_include_directories(dawn_utils PUBLIC "${CMAKE_BINARY_DIR}/_deps/dawn-src/src")
+target_include_directories(dawn_utils PUBLIC "${FETCHCONTENT_BASE_DIR}/dawn-src/src")
