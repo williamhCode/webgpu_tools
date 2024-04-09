@@ -15,12 +15,14 @@ if (EMSCRIPTEN)
   target_compile_definitions(webgpu INTERFACE WEBGPU_BACKEND_EMSCRIPTEN)
 
 else (EMSCRIPTEN)
-  set(FETCHCONTENT_BASE_DIR "${CMAKE_CURRENT_LIST_DIR}/fetch-content")
+  if (NOT XCODE)
+    set(FETCHCONTENT_BASE_DIR "${CMAKE_CURRENT_LIST_DIR}/fetch-content")
+  endif()
+
   include(cmake/FetchDawn.cmake)
 
   target_link_libraries(webgpu INTERFACE webgpu_dawn)
 
-  # This is used to advertise the flavor of WebGPU that this zip provides
   target_compile_definitions(webgpu INTERFACE WEBGPU_BACKEND_DAWN)
 
 endif (EMSCRIPTEN)
