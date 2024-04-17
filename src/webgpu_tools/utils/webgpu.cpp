@@ -253,4 +253,25 @@ VertexBufferLayout& VertexBufferLayout::operator=(const VertexBufferLayout& othe
   return *this;
 }
 
+RenderPipeline RenderPipelineMaker::Make(const wgpu::Device &device) {
+  return device.CreateRenderPipeline(ToPtr(RenderPipelineDescriptor{
+    .layout = layout,
+    .vertex{
+      .module = module,
+      .entryPoint = "vs_main",
+      .bufferCount = buffers.size(),
+      .buffers = buffers.data(),
+    },
+    .primitive = primitive,
+    .depthStencil = depthStencil.format == TextureFormat::Undefined ? nullptr : &depthStencil,
+    .multisample = multisample,
+    .fragment = targets.empty() ? nullptr : ToPtr(FragmentState{
+      .module = fsModule == nullptr ? module : fsModule,
+      .entryPoint = "fs_main",
+      .targetCount = targets.size(),
+      .targets = targets.data(),
+    }),
+  }));
+}
+
 } // namespace wgpu::utils

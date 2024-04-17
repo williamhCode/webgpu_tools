@@ -3,6 +3,7 @@
 #include "webgpu/webgpu_cpp.h"
 #include "dawn/utils/WGPUHelpers.h"
 #include <filesystem>
+#include <memory>
 #include <vector>
 
 namespace wgpu::utils {
@@ -55,9 +56,28 @@ struct VertexBufferLayout : public wgpu::VertexBufferLayout {
 
   std::vector<wgpu::VertexAttribute> cAttributes;
 };
+
+struct RenderPipelineMaker{
+  wgpu::PipelineLayout layout;
+  ShaderModule module;
+  std::vector<wgpu::utils::VertexBufferLayout> buffers;
+  wgpu::PrimitiveState primitive;
+  wgpu::DepthStencilState depthStencil;
+  wgpu::MultisampleState multisample;
+  ShaderModule fsModule;
+  std::vector<wgpu::ColorTargetState> targets;
+
+  wgpu::RenderPipeline Make(const wgpu::Device &device);
+};
 // clang-format on
 
 struct BlendComponent {
+  static constexpr wgpu::BlendComponent Replace = {
+    .operation = wgpu::BlendOperation::Add,
+    .srcFactor = wgpu::BlendFactor::One,
+    .dstFactor = wgpu::BlendFactor::Zero,
+  };
+
   static constexpr wgpu::BlendComponent Over = {
     .operation = wgpu::BlendOperation::Add,
     .srcFactor = wgpu::BlendFactor::One,
@@ -66,6 +86,11 @@ struct BlendComponent {
 };
 
 struct BlendState {
+  static constexpr wgpu::BlendState Replace = {
+    .color = BlendComponent::Replace,
+    .alpha = BlendComponent::Replace,
+  };
+
   static constexpr wgpu::BlendState AlphaBlending = {
     .color{
       .operation = wgpu::BlendOperation::Add,
