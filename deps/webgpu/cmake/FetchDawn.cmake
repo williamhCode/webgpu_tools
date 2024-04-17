@@ -8,14 +8,14 @@ include(FetchContent)
 FetchContent_Declare(
   dawn
   #GIT_REPOSITORY https://dawn.googlesource.com/dawn
-  #GIT_TAG        chromium/6265
+  #GIT_TAG        chromium/6423
   #GIT_SHALLOW ON
 
   # Manual download mode, even shallower than GIT_SHALLOW ON
   DOWNLOAD_COMMAND
     cd ${FETCHCONTENT_BASE_DIR}/dawn-src &&
     git init &&
-    git fetch --depth=1 https://dawn.googlesource.com/dawn chromium/6265 &&
+    git fetch --depth=1 https://dawn.googlesource.com/dawn chromium/6423 &&
     git reset --hard FETCH_HEAD
 )
 
@@ -71,7 +71,7 @@ set(AllDawnTargets
   dawn_proc
   dawn_utils
   dawn_wire
-  dawncpp
+  # dawncpp
   dawncpp_headers
   emscripten_bits_gen
   enum_string_mapping
@@ -154,6 +154,7 @@ set(AllDawnTargets
 
 foreach (Target ${AllDawnTargets})
   if (TARGET ${Target})
+    # message(STATUS "Adding Dawn target: ${Target}")
     set_property(TARGET ${Target} PROPERTY FOLDER "Dawn")
   endif()
 endforeach()
