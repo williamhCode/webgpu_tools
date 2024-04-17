@@ -57,20 +57,29 @@ struct VertexBufferLayout : public wgpu::VertexBufferLayout {
 };
 // clang-format on
 
-namespace BlendState {
-const wgpu::BlendState AlphaBlending = {
-  .color{
-    .operation = wgpu::BlendOperation::Add,
-    .srcFactor = wgpu::BlendFactor::SrcAlpha,
-    .dstFactor = wgpu::BlendFactor::OneMinusSrcAlpha,
-  },
-  .alpha{
+struct BlendComponent {
+  static constexpr wgpu::BlendComponent Over = {
     .operation = wgpu::BlendOperation::Add,
     .srcFactor = wgpu::BlendFactor::One,
     .dstFactor = wgpu::BlendFactor::OneMinusSrcAlpha,
-  },
+  };
 };
-}
+
+struct BlendState {
+  static constexpr wgpu::BlendState AlphaBlending = {
+    .color{
+      .operation = wgpu::BlendOperation::Add,
+      .srcFactor = wgpu::BlendFactor::SrcAlpha,
+      .dstFactor = wgpu::BlendFactor::OneMinusSrcAlpha,
+    },
+    .alpha = BlendComponent::Over,
+  };
+
+  static constexpr wgpu::BlendState PremultipliedAlphaBlending = {
+    .color = BlendComponent::Over,
+    .alpha = BlendComponent::Over,
+  };
+};
 
 // useful dawn utils
 using dawn::utils::MakeBindGroup;
