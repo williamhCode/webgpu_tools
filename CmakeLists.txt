@@ -12,7 +12,7 @@ add_subdirectory(deps/SDL3-3.1.1)
 
 add_library(webgpu_tools STATIC
   src/webgpu_tools/utils/webgpu.cpp
-  src/webgpu_tools/utils/sdl3webgpu.m
+  src/webgpu_tools/utils/sdl3webgpu.mm
 )
 
 set_target_properties(webgpu_tools PROPERTIES

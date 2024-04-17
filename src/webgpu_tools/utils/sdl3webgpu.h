@@ -36,7 +36,6 @@
 #ifdef __cplusplus
 extern "C" {
 #endif
-
 /**
  * Get a WGPUSurface from a SDL3 window.
  */

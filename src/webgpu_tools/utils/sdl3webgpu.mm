@@ -31,24 +31,23 @@
  */
 
 #include "sdl3webgpu.h"
+#include "webgpu_tools/utils/webgpu.hpp"
 
 #include <webgpu/webgpu.h>
 
 #if defined(SDL_PLATFORM_MACOS)
-  #include <Cocoa/Cocoa.h>
-  #include <Foundation/Foundation.h>
-  #include <QuartzCore/CAMetalLayer.h>
+#include <Cocoa/Cocoa.h>
+#include <Foundation/Foundation.h>
+#include <QuartzCore/CAMetalLayer.h>
 #endif
-
-#include <SDL3/SDL.h>
 
 WGPUSurface SDL_GetWGPUSurface(WGPUInstance instance, SDL_Window *window) {
 
 #if defined(SDL_PLATFORM_MACOS)
   {
-    id metal_layer = NULL;
-    NSWindow *ns_window = (__bridge NSWindow *)SDL_GetProperty(
-      SDL_GetWindowProperties(window), SDL_PROP_WINDOW_COCOA_WINDOW_POINTER, NULL
+    id metal_layer = nullptr;
+    NSWindow* ns_window = (__bridge NSWindow *)SDL_GetProperty(
+      SDL_GetWindowProperties(window), SDL_PROP_WINDOW_COCOA_WINDOW_POINTER, nullptr
     );
 
     [ns_window.contentView setWantsLayer:YES];
@@ -57,17 +56,17 @@ WGPUSurface SDL_GetWGPUSurface(WGPUInstance instance, SDL_Window *window) {
 
     return wgpuInstanceCreateSurface(
       instance,
-      &(WGPUSurfaceDescriptor){
-        .label = NULL,
-        .nextInChain = (const WGPUChainedStruct *)&(WGPUSurfaceDescriptorFromMetalLayer){
+      ToPtr(WGPUSurfaceDescriptor{
+        .nextInChain = (const WGPUChainedStruct *)ToPtr(WGPUSurfaceDescriptorFromMetalLayer{
           .chain = (WGPUChainedStruct){
             .next = NULL,
             .sType = WGPUSType_SurfaceDescriptorFromMetalLayer,
           },
           .layer = metal_layer,
-        },
+        }),
+        .label = nullptr,
       }
-    );
+    ));
   }
 // #elif defined(SDL_VIDEO_DRIVER_X11)
 //     {
