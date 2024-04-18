@@ -1,39 +1,6 @@
-/**
- * This is an extension of SDL2 for WebGPU, abstracting away the details of
- * OS-specific operations.
- *
- * This file is part of the "Learn WebGPU for C++" book.
- *   https://eliemichel.github.io/LearnWebGPU
- *
- * Most of this code comes from the wgpu-native triangle example:
- *   https://github.com/gfx-rs/wgpu-native/blob/master/examples/triangle/main.c
- *
- * MIT License
- * Copyright (c) 2022-2023 Elie Michel and the wgpu-native authors
- *
- * Permission is hereby granted, free of charge, to any person obtaining a copy
- * of this software and associated documentation files (the "Software"), to deal
- * in the Software without restriction, including without limitation the rights
- * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
- * copies of the Software, and to permit persons to whom the Software is
- * furnished to do so, subject to the following conditions:
- *
- * The above copyright notice and this permission notice shall be included in
- * all copies or substantial portions of the Software.
- *
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
- * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
- * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
- * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
- * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
- * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
- * SOFTWARE.
- */
-
+#include "SDL3/SDL.h"
 #include "sdl3webgpu.h"
 #include "webgpu_tools/utils/webgpu.hpp"
-
-#include <webgpu/webgpu.h>
 
 #if defined(SDL_PLATFORM_MACOS)
 #include <Cocoa/Cocoa.h>
@@ -41,32 +8,23 @@
 #include <QuartzCore/CAMetalLayer.h>
 #endif
 
-WGPUSurface SDL_GetWGPUSurface(WGPUInstance instance, SDL_Window *window) {
-
+wgpu::Surface SDL_GetWGPUSurface(const wgpu::Instance& instance, SDL_Window* window) {
 #if defined(SDL_PLATFORM_MACOS)
   {
-    id metal_layer = nullptr;
-    NSWindow* ns_window = (__bridge NSWindow *)SDL_GetProperty(
+    auto* ns_window = (__bridge NSWindow*)SDL_GetProperty(
       SDL_GetWindowProperties(window), SDL_PROP_WINDOW_COCOA_WINDOW_POINTER, nullptr
     );
 
     [ns_window.contentView setWantsLayer:YES];
-    metal_layer = [CAMetalLayer layer];
+    id metal_layer = [CAMetalLayer layer];
     [ns_window.contentView setLayer:metal_layer];
 
-    return wgpuInstanceCreateSurface(
-      instance,
-      ToPtr(WGPUSurfaceDescriptor{
-        .nextInChain = (const WGPUChainedStruct *)ToPtr(WGPUSurfaceDescriptorFromMetalLayer{
-          .chain = (WGPUChainedStruct){
-            .next = NULL,
-            .sType = WGPUSType_SurfaceDescriptorFromMetalLayer,
-          },
-          .layer = metal_layer,
-        }),
-        .label = nullptr,
-      }
-    ));
+    wgpu::SurfaceDescriptorFromMetalLayer desc;
+    desc.layer = metal_layer;
+
+    return instance.CreateSurface(ToPtr(wgpu::SurfaceDescriptor{
+      .nextInChain = &desc,
+    }));
   }
 // #elif defined(SDL_VIDEO_DRIVER_X11)
 //     {
@@ -111,7 +69,7 @@ WGPUSurface SDL_GetWGPUSurface(WGPUInstance instance, SDL_Window *window) {
 //                 },
 //         });
 //   }
-// #elif defined(SDL_VIDEO_DRIVER_WINDOWS)
+#elif defined(SDL_VIDEO_DRIVER_WINDOWS)
 //     {
 //         HWND hwnd = windowWMInfo.info.win.window;
 //         HINSTANCE hinstance = GetModuleHandle(NULL);
@@ -133,7 +91,6 @@ WGPUSurface SDL_GetWGPUSurface(WGPUInstance instance, SDL_Window *window) {
 //     });
 //   }
 #else
-  // TODO: See SDL_syswm.h for other possible enum values!
-#error "Unsupported WGPU_TARGET"
+#error "Unsupported Target"
 #endif
 }

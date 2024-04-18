@@ -3,7 +3,6 @@
 #include "webgpu/webgpu_cpp.h"
 #include "dawn/utils/WGPUHelpers.h"
 #include <filesystem>
-#include <memory>
 #include <vector>
 
 namespace wgpu::utils {
