@@ -4,7 +4,6 @@ project(WebGPU_Tools VERSION 1.0.0)
 
 set(DAWN_FETCH_DEPENDENCIES ON)
 
-# add_subdirectory(deps/glfw)
 add_subdirectory(deps/webgpu)
 add_subdirectory(deps/glm)
 add_subdirectory(deps/stb)
@@ -34,5 +33,4 @@ target_link_libraries(webgpu_tools PUBLIC
   SDL3::SDL3
   glm stb
   webgpu dawncpp dawn_utils
-  # glfw dawn_glfw 
 )
