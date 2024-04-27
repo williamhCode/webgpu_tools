@@ -228,49 +228,73 @@ RenderPassDescriptor& RenderPassDescriptor::operator=(const RenderPassDescriptor
   return *this;
 }
 
-VertexBufferLayout::VertexBufferLayout(
-  uint64_t arrayStride,
-  std::vector<wgpu::VertexAttribute> attributes,
-  VertexStepMode stepMode
-) : cAttributes(std::move(attributes)) {
-  this->arrayStride = arrayStride;
-  this->stepMode = stepMode;
-  attributeCount = cAttributes.size();
-  this->attributes = cAttributes.data();
-}
+// VertexBufferLayout::VertexBufferLayout(
+//   uint64_t arrayStride,
+//   std::vector<wgpu::VertexAttribute> attributes,
+//   VertexStepMode stepMode
+// ) : cAttributes(std::move(attributes)) {
+//   this->arrayStride = arrayStride;
+//   this->stepMode = stepMode;
+//   attributeCount = cAttributes.size();
+//   this->attributes = cAttributes.data();
+// }
 
-VertexBufferLayout::VertexBufferLayout(const VertexBufferLayout& other) {
-  *this = other;
-}
+// VertexBufferLayout::VertexBufferLayout(const VertexBufferLayout& other) {
+//   *this = other;
+// }
 
-VertexBufferLayout& VertexBufferLayout::operator=(const VertexBufferLayout& other
-) {
-  cAttributes = other.cAttributes;
-  arrayStride = other.arrayStride;
-  stepMode = other.stepMode;
-  attributeCount = other.attributeCount;
-  attributes = cAttributes.data();
-  return *this;
-}
+// VertexBufferLayout& VertexBufferLayout::operator=(const VertexBufferLayout& other
+// ) {
+//   cAttributes = other.cAttributes;
+//   arrayStride = other.arrayStride;
+//   stepMode = other.stepMode;
+//   attributeCount = other.attributeCount;
+//   attributes = cAttributes.data();
+//   return *this;
+// }
 
-RenderPipeline RenderPipelineMaker::Make(const wgpu::Device &device) {
-  return device.CreateRenderPipeline(ToPtr(RenderPipelineDescriptor{
-    .layout = layout,
+RenderPipeline MakeRenderPipeline(const wgpu::Device &device, const utils::RenderPipelineDescriptor &desc) {
+  // convert vertex buffer layout
+  std::vector<wgpu::VertexBufferLayout> buffers;
+  std::vector<std::vector<wgpu::VertexAttribute>> attributess;
+
+  for (const auto & buffer : desc.buffers) {
+    auto& attributes = attributess.emplace_back();
+
+    for (size_t j = 0; j < buffer.attributes.size(); j++) {
+      const auto& attr = buffer.attributes[j];
+      attributes.push_back({
+        .format = attr.format,
+        .offset = attr.offset,
+        .shaderLocation = (uint32_t)j,
+      });
+    }
+
+    buffers.push_back({
+      .arrayStride = buffer.arrayStride,
+      .stepMode = buffer.stepMode,
+      .attributeCount = attributes.size(),
+      .attributes = attributes.data(),
+    });
+  }
+
+  return device.CreateRenderPipeline(ToPtr(wgpu::RenderPipelineDescriptor{
+    .layout = utils::MakePipelineLayout(device, desc.bgls),
     .vertex{
-      .module = module,
+      .module = desc.vs,
       .entryPoint = "vs_main",
       .bufferCount = buffers.size(),
       .buffers = buffers.data(),
     },
-    .primitive = primitive,
-    .depthStencil = depthStencil.format == TextureFormat::Undefined ? nullptr : &depthStencil,
-    .multisample = multisample,
-    .fragment = targets.empty() ? nullptr : ToPtr(FragmentState{
-      .module = fsModule == nullptr ? module : fsModule,
+    .primitive = desc.primitive,
+    .depthStencil = desc.depthStencil.format == TextureFormat::Undefined ? nullptr : &desc.depthStencil,
+    .multisample = desc.multisample,
+    .fragment = desc.fs ? ToPtr(FragmentState{
+      .module = desc.fs,
       .entryPoint = "fs_main",
-      .targetCount = targets.size(),
-      .targets = targets.data(),
-    }),
+      .targetCount = desc.targets.size(),
+      .targets = desc.targets.data(),
+    }) : nullptr,
   }));
 }
 
