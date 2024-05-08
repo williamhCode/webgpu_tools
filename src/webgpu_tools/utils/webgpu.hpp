@@ -25,6 +25,7 @@ wgpu::Buffer CreateIndexBuffer(const wgpu::Device &device, size_t size, const vo
 wgpu::Buffer CreateUniformBuffer(const wgpu::Device &device, size_t size, const void *data = nullptr);
 wgpu::Buffer CreateStorageBuffer(const wgpu::Device &device, size_t size, const void *data = nullptr);
 
+void WriteTexture(const wgpu::Device &device, const wgpu::Texture &texture, wgpu::Extent3D size, const void *data);
 wgpu::Texture CreateTexture(const wgpu::Device& device, wgpu::TextureUsage usage, wgpu::Extent3D size, wgpu::TextureFormat format, const void* data);
 wgpu::Texture CreateBindingTexture(const wgpu::Device &device, wgpu::Extent3D size, wgpu::TextureFormat format, const void *data = nullptr);
 wgpu::Texture CreateRenderTexture(const wgpu::Device &device, wgpu::Extent3D size, wgpu::TextureFormat format, const void *data = nullptr);

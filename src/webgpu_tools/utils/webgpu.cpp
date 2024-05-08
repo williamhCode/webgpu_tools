@@ -1,4 +1,5 @@
 #include "webgpu.hpp"
+#include "webgpu/webgpu_cpp.h"
 #include <iostream>
 #include <fstream>
 #include <sstream>
@@ -145,6 +146,25 @@ wgpu::Buffer CreateStorageBuffer(const wgpu::Device& device, size_t size, const 
   return CreateBuffer(device, BufferUsage::Storage, size, data);
 }
 
+void WriteTexture(
+  const wgpu::Device& device,
+  const wgpu::Texture& texture,
+  wgpu::Extent3D size,
+  const void* data
+) {
+  auto texelBlockSize = dawn::utils::GetTexelBlockSizeInBytes(texture.GetFormat());
+  ImageCopyTexture destination{
+    .texture = texture,
+  };
+  TextureDataLayout dataLayout{
+    .bytesPerRow = size.width * texelBlockSize,
+    .rowsPerImage = size.height,
+  };
+  device.GetQueue().WriteTexture(
+    &destination, data, size.width * size.height * texelBlockSize, &dataLayout, &size
+  );
+}
+
 wgpu::Texture CreateTexture(
   const wgpu::Device& device,
   wgpu::TextureUsage usage,
@@ -159,17 +179,7 @@ wgpu::Texture CreateTexture(
   };
   Texture texture = device.CreateTexture(&textureDesc);
   if (data) {
-    auto texelBlockSize = dawn::utils::GetTexelBlockSizeInBytes(format);
-    ImageCopyTexture destination{
-      .texture = texture,
-    };
-    TextureDataLayout dataLayout{
-      .bytesPerRow = size.width * texelBlockSize,
-      .rowsPerImage = size.height,
-    };
-    device.GetQueue().WriteTexture(
-      &destination, data, size.width * size.height * texelBlockSize, &dataLayout, &size
-    );
+    WriteTexture(device, texture, size, data);
   }
   return texture;
 }
