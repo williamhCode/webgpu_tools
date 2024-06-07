@@ -16,9 +16,9 @@ if (EMSCRIPTEN)
 
 else (EMSCRIPTEN)
   if (NOT XCODE)
-    set(FETCHCONTENT_BASE_DIR "${CMAKE_CURRENT_LIST_DIR}/fetch-content")
+    set(DAWN_FETCH_DIR "${CMAKE_CURRENT_LIST_DIR}/fetch-content")
   else()
-    set(FETCHCONTENT_BASE_DIR "${CMAKE_CURRENT_LIST_DIR}/fetch-content-xcode")
+    set(DAWN_FETCH_DIR "${CMAKE_CURRENT_LIST_DIR}/fetch-content-xcode")
   endif()
 
   include(cmake/FetchDawn.cmake)
