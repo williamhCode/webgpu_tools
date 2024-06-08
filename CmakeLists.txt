@@ -6,8 +6,8 @@ set(DAWN_FETCH_DEPENDENCIES ON)
 
 add_subdirectory(deps/SDL3-3.1.2)
 add_subdirectory(deps/glm-1.0.1)
-add_subdirectory(deps/webgpu)
 add_subdirectory(deps/stb)
+# add_subdirectory(deps/webgpu)
 
 add_library(webgpu_tools STATIC
   src/webgpu_tools/utils/webgpu.cpp
@@ -22,6 +22,10 @@ set_target_properties(webgpu_tools PROPERTIES
 target_include_directories(
   webgpu_tools PUBLIC
   ${PROJECT_SOURCE_DIR}/src
+
+  ${PROJECT_SOURCE_DIR}/deps/dawn/include/dawn-src/include
+  ${PROJECT_SOURCE_DIR}/deps/dawn/include/dawn-src/src
+  ${PROJECT_SOURCE_DIR}/deps/dawn/include/dawn-build/gen/include
 )
 
 target_compile_definitions(webgpu_tools PUBLIC
@@ -33,5 +37,14 @@ target_compile_definitions(webgpu_tools PUBLIC
 target_link_libraries(webgpu_tools PUBLIC
   SDL3::SDL3
   glm stb
-  webgpu dawncpp dawn_utils
+  ${PROJECT_SOURCE_DIR}/deps/dawn/lib/libdawn.a
+  # webgpu dawncpp dawn_utils
+)
+
+target_link_libraries(webgpu_tools PRIVATE "-framework Cocoa")
+target_link_libraries(webgpu_tools PRIVATE
+    "-framework IOKit"
+    "-framework IOSurface"
+    "-framework QuartzCore"
+    "-framework Metal"
 )
