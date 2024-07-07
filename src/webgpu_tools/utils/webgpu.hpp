@@ -17,7 +17,8 @@ void SetUncapturedErrorCallback(const wgpu::Device &device);
 
 wgpu::ShaderModule LoadShaderModule(const wgpu::Device &device, const std::filesystem::path &path);
 
-void PrintLimits(wgpu::Limits const &limits);
+void PrintLimits(const wgpu::Limits& limits);
+void PrintSurfaceCapabilities(const SurfaceCapabilities& config);
 
 wgpu::Buffer CreateBuffer(const wgpu::Device &device, wgpu::BufferUsage usage, size_t size, const void *data = nullptr);
 wgpu::Buffer CreateVertexBuffer(const wgpu::Device &device, size_t size, const void *data = nullptr);

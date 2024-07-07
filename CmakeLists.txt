@@ -7,6 +7,7 @@ set(DAWN_FETCH_DEPENDENCIES ON)
 add_subdirectory(deps/SDL EXCLUDE_FROM_ALL)
 add_subdirectory(deps/glm-1.0.1)
 add_subdirectory(deps/stb)
+add_subdirectory(deps/magic_enum)
 find_package(PkgConfig)
 pkg_check_modules(Dawn REQUIRED IMPORTED_TARGET dawn)
 
@@ -16,13 +17,15 @@ add_library(webgpu_tools STATIC
 )
 
 set_target_properties(webgpu_tools PROPERTIES
-  CXX_STANDARD 20
+  CXX_STANDARD 23
   CXX_STANDARD_REQUIRED ON
 )
 
 target_link_libraries(webgpu_tools PUBLIC
   SDL3::SDL3
-  glm stb
+  glm
+  stb
+  magic_enum::magic_enum
   PkgConfig::Dawn
   "-framework Cocoa"
   "-framework IOKit"

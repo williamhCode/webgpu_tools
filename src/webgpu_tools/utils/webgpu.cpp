@@ -1,8 +1,10 @@
 #include "webgpu.hpp"
 #include "webgpu/webgpu_cpp.h"
+#include "magic_enum.hpp"
 #include <iostream>
 #include <fstream>
 #include <sstream>
+#include <print>
 
 namespace wgpu::utils {
 
@@ -119,6 +121,18 @@ void PrintLimits(const wgpu::Limits &limits) {
   std::cout << " - maxComputeWorkgroupsPerDimension: " << limits.maxComputeWorkgroupsPerDimension << "\n";
 }
 // clang-format on
+
+void PrintSurfaceCapabilities(const SurfaceCapabilities& config) {
+  for (size_t i = 0; i < config.formatCount; i++) {
+    std::println("Format: {}", magic_enum::enum_name(config.formats[i]));
+  }
+  for (size_t i = 0; i < config.presentModeCount; i++) {
+    std::println("Present Mode: {}", magic_enum::enum_name(config.presentModes[i]));
+  }
+  for (size_t i = 0; i < config.alphaModeCount; i++) {
+    std::println("Alpha Mode: {}", magic_enum::enum_name(config.alphaModes[i]));
+  }
+}
 
 wgpu::Buffer CreateBuffer(const wgpu::Device& device, wgpu::BufferUsage usage, size_t size, const void* data) {
   BufferDescriptor bufferDesc{
