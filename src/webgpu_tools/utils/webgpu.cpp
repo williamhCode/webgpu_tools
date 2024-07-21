@@ -1,4 +1,5 @@
 #include "webgpu.hpp"
+#include "glm/fwd.hpp"
 #include "webgpu/webgpu_cpp.h"
 #include "magic_enum.hpp"
 #include <iostream>
@@ -134,7 +135,7 @@ void PrintSurfaceCapabilities(const SurfaceCapabilities& config) {
   }
 }
 
-wgpu::Buffer CreateBuffer(const wgpu::Device& device, wgpu::BufferUsage usage, size_t size, const void* data) {
+wgpu::Buffer CreateBuffer(const wgpu::Device& device, wgpu::BufferUsage usage, uint64_t size, const void* data) {
   BufferDescriptor bufferDesc{
     .usage = BufferUsage::CopyDst | usage,
     .size = size,
@@ -144,28 +145,38 @@ wgpu::Buffer CreateBuffer(const wgpu::Device& device, wgpu::BufferUsage usage, s
   return buffer;
 }
 
-wgpu::Buffer CreateVertexBuffer(const wgpu::Device& device, size_t size, const void* data) {
+wgpu::Buffer CreateVertexBuffer(const wgpu::Device& device, uint64_t size, const void* data) {
   return CreateBuffer(device, BufferUsage::Vertex, size, data);
 }
 
-wgpu::Buffer CreateIndexBuffer(const wgpu::Device& device, size_t size, const void* data) {
+wgpu::Buffer CreateIndexBuffer(const wgpu::Device& device, uint64_t size, const void* data) {
   return CreateBuffer(device, BufferUsage::Index, size, data);
 }
 
-wgpu::Buffer CreateUniformBuffer(const wgpu::Device& device, size_t size, const void* data) {
+wgpu::Buffer CreateUniformBuffer(const wgpu::Device& device, uint64_t size, const void* data) {
   return CreateBuffer(device, BufferUsage::Uniform, size, data);
 }
 
-wgpu::Buffer CreateStorageBuffer(const wgpu::Device& device, size_t size, const void* data) {
+wgpu::Buffer CreateStorageBuffer(const wgpu::Device& device, uint64_t size, const void* data) {
   return CreateBuffer(device, BufferUsage::Storage, size, data);
 }
 
 void WriteTexture(
   const wgpu::Device& device,
   const wgpu::Texture& texture,
-  wgpu::Extent3D size,
+  glm::uvec2 size,
   const void* data
 ) {
+  WriteTexture(device, texture, {size.x, size.y, 1}, data);
+}
+
+void WriteTexture(
+  const wgpu::Device& device,
+  const wgpu::Texture& texture,
+  glm::uvec3 _size,
+  const void* data
+) {
+  wgpu::Extent3D size{_size.x, _size.y, _size.z};
   auto texelBlockSize = dawn::utils::GetTexelBlockSizeInBytes(texture.GetFormat());
   ImageCopyTexture destination{
     .texture = texture,
@@ -182,10 +193,21 @@ void WriteTexture(
 wgpu::Texture CreateTexture(
   const wgpu::Device& device,
   wgpu::TextureUsage usage,
-  wgpu::Extent3D size,
+  glm::uvec2 size,
   wgpu::TextureFormat format,
   const void* data
 ) {
+  return CreateTexture(device, usage, {size.x, size.y, 1}, format, data);
+}
+
+wgpu::Texture CreateTexture(
+  const wgpu::Device& device,
+  wgpu::TextureUsage usage,
+  glm::uvec3 _size,
+  wgpu::TextureFormat format,
+  const void* data
+) {
+  wgpu::Extent3D size{_size.x, _size.y, _size.z};
   TextureDescriptor textureDesc{
     .usage = TextureUsage::CopyDst | usage,
     .size = size,
@@ -193,14 +215,23 @@ wgpu::Texture CreateTexture(
   };
   Texture texture = device.CreateTexture(&textureDesc);
   if (data) {
-    WriteTexture(device, texture, size, data);
+    WriteTexture(device, texture, _size, data);
   }
   return texture;
 }
 
 wgpu::Texture CreateBindingTexture(
   const wgpu::Device& device,
-  wgpu::Extent3D size,
+  glm::uvec2 size,
+  wgpu::TextureFormat format,
+  const void* data
+) {
+  return CreateTexture(device, TextureUsage::TextureBinding, size, format, data);
+}
+
+wgpu::Texture CreateBindingTexture(
+  const wgpu::Device& device,
+  glm::uvec3 size,
   wgpu::TextureFormat format,
   const void* data
 ) {
@@ -209,7 +240,16 @@ wgpu::Texture CreateBindingTexture(
 
 wgpu::Texture CreateRenderTexture(
   const wgpu::Device& device,
-  wgpu::Extent3D size,
+  glm::uvec2 size,
+  wgpu::TextureFormat format,
+  const void* data
+) {
+  return CreateTexture(device, TextureUsage::RenderAttachment | TextureUsage::TextureBinding, size, format, data);
+}
+
+wgpu::Texture CreateRenderTexture(
+  const wgpu::Device& device,
+  glm::uvec3 size,
   wgpu::TextureFormat format,
   const void* data
 ) {
