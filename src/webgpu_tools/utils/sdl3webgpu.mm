@@ -11,13 +11,10 @@
 wgpu::Surface SDL_GetWGPUSurface(const wgpu::Instance& instance, SDL_Window* window) {
 #if defined(SDL_PLATFORM_MACOS)
   {
-    auto* ns_window = (__bridge NSWindow*)SDL_GetProperty(
-      SDL_GetWindowProperties(window), SDL_PROP_WINDOW_COCOA_WINDOW_POINTER, nullptr
-    );
-
-    [ns_window.contentView setWantsLayer:YES];
+    NSWindow *nswindow = (__bridge NSWindow *)SDL_GetPointerProperty(SDL_GetWindowProperties(window), SDL_PROP_WINDOW_COCOA_WINDOW_POINTER, NULL);
+    [nswindow.contentView setWantsLayer:YES];
     id metal_layer = [CAMetalLayer layer];
-    [ns_window.contentView setLayer:metal_layer];
+    [nswindow.contentView setLayer:metal_layer];
 
     wgpu::SurfaceDescriptorFromMetalLayer desc;
     desc.layer = metal_layer;
