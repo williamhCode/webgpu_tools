@@ -2,8 +2,9 @@
 
 #include "webgpu/webgpu_cpp.h"
 #include "dawn/utils/WGPUHelpers.h"
+#include "glm/ext/vector_uint2.hpp"
+#include "glm/ext/vector_uint3.hpp"
 #include <filesystem>
-#include <span>
 #include <vector>
 
 namespace wgpu::utils {
@@ -17,18 +18,23 @@ void SetUncapturedErrorCallback(const wgpu::Device &device);
 
 wgpu::ShaderModule LoadShaderModule(const wgpu::Device &device, const std::filesystem::path &path);
 
-void PrintLimits(wgpu::Limits const &limits);
+void PrintLimits(const wgpu::Limits& limits);
+void PrintSurfaceCapabilities(const SurfaceCapabilities& config);
 
-wgpu::Buffer CreateBuffer(const wgpu::Device &device, wgpu::BufferUsage usage, size_t size, const void *data = nullptr);
-wgpu::Buffer CreateVertexBuffer(const wgpu::Device &device, size_t size, const void *data = nullptr);
-wgpu::Buffer CreateIndexBuffer(const wgpu::Device &device, size_t size, const void *data = nullptr);
-wgpu::Buffer CreateUniformBuffer(const wgpu::Device &device, size_t size, const void *data = nullptr);
-wgpu::Buffer CreateStorageBuffer(const wgpu::Device &device, size_t size, const void *data = nullptr);
+wgpu::Buffer CreateBuffer(const wgpu::Device &device, wgpu::BufferUsage usage, uint64_t size, const void *data = nullptr);
+wgpu::Buffer CreateVertexBuffer(const wgpu::Device &device, uint64_t size, const void *data = nullptr);
+wgpu::Buffer CreateIndexBuffer(const wgpu::Device &device, uint64_t size, const void *data = nullptr);
+wgpu::Buffer CreateUniformBuffer(const wgpu::Device &device, uint64_t size, const void *data = nullptr);
+wgpu::Buffer CreateStorageBuffer(const wgpu::Device &device, uint64_t size, const void *data = nullptr);
 
-void WriteTexture(const wgpu::Device &device, const wgpu::Texture &texture, wgpu::Extent3D size, const void *data);
-wgpu::Texture CreateTexture(const wgpu::Device& device, wgpu::TextureUsage usage, wgpu::Extent3D size, wgpu::TextureFormat format, const void* data);
-wgpu::Texture CreateBindingTexture(const wgpu::Device &device, wgpu::Extent3D size, wgpu::TextureFormat format, const void *data = nullptr);
-wgpu::Texture CreateRenderTexture(const wgpu::Device &device, wgpu::Extent3D size, wgpu::TextureFormat format, const void *data = nullptr);
+void WriteTexture(const wgpu::Device &device, const wgpu::Texture &texture, glm::uvec2 size, const void *data);
+void WriteTexture(const wgpu::Device &device, const wgpu::Texture &texture, glm::uvec3 size, const void *data);
+wgpu::Texture CreateTexture(const wgpu::Device& device, wgpu::TextureUsage usage, glm::uvec2 size, wgpu::TextureFormat format, const void* data);
+wgpu::Texture CreateTexture(const wgpu::Device& device, wgpu::TextureUsage usage, glm::uvec3 size, wgpu::TextureFormat format, const void* data);
+wgpu::Texture CreateBindingTexture(const wgpu::Device &device, glm::uvec2 size, wgpu::TextureFormat format, const void *data = nullptr);
+wgpu::Texture CreateBindingTexture(const wgpu::Device &device, glm::uvec3 size, wgpu::TextureFormat format, const void *data = nullptr);
+wgpu::Texture CreateRenderTexture(const wgpu::Device &device, glm::uvec2 size, wgpu::TextureFormat format, const void *data = nullptr);
+wgpu::Texture CreateRenderTexture(const wgpu::Device &device, glm::uvec3 size, wgpu::TextureFormat format, const void *data = nullptr);
 
 struct RenderPassDescriptor : public wgpu::RenderPassDescriptor{
   RenderPassDescriptor(
