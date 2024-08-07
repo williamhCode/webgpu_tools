@@ -8,7 +8,7 @@ include(FetchContent)
 FetchContent_Declare(
   dawn
   #GIT_REPOSITORY https://dawn.googlesource.com/dawn
-  #GIT_TAG        chromium/6500
+  #GIT_TAG        chromium/6640
   #GIT_SHALLOW ON
 
   # Manual download mode, even shallower than GIT_SHALLOW ON
@@ -16,7 +16,7 @@ FetchContent_Declare(
     mkdir -p ${DAWN_FETCH_DIR}/dawn-src &&
     cd ${DAWN_FETCH_DIR}/dawn-src &&
     git init &&
-    git fetch --depth=1 https://dawn.googlesource.com/dawn chromium/6500 &&
+    git fetch --depth=1 https://dawn.googlesource.com/dawn chromium/6640 &&
     git reset --hard FETCH_HEAD
 )
 
