@@ -1,4 +1,4 @@
-#include "webgpu.hpp"
+#include "webgpu_utils.hpp"
 #include "glm/fwd.hpp"
 #include "webgpu/webgpu_cpp.h"
 #include "magic_enum.hpp"
@@ -83,7 +83,7 @@ ShaderModule LoadShaderModule(const Device& device, const std::filesystem::path&
   std::stringstream buffer;
   buffer << file.rdbuf();
 
-  return dawn::utils::CreateShaderModule(device, buffer.str());
+  // return dawn::utils::CreateShaderModule(device, buffer.str());
 }
 
 // clang-format off
@@ -177,7 +177,8 @@ void WriteTexture(
   const void* data
 ) {
   wgpu::Extent3D size{_size.x, _size.y, _size.z};
-  auto texelBlockSize = dawn::utils::GetTexelBlockSizeInBytes(texture.GetFormat());
+  // auto texelBlockSize = dawn::utils::GetTexelBlockSizeInBytes(texture.GetFormat());
+  int texelBlockSize = 1;
   ImageCopyTexture destination{
     .texture = texture,
   };
@@ -343,7 +344,7 @@ RenderPipeline MakeRenderPipeline(const wgpu::Device &device, const utils::Rende
   }
 
   return device.CreateRenderPipeline(ToPtr(wgpu::RenderPipelineDescriptor{
-    .layout = utils::MakePipelineLayout(device, desc.bgls),
+    // .layout = utils::MakePipelineLayout(device, desc.bgls),
     .vertex{
       .module = desc.vs,
       .entryPoint = "vs_main",
