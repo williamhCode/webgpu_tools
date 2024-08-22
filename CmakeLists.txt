@@ -68,35 +68,31 @@ target_include_directories(webgpu_tools PUBLIC
   ${PROJECT_SOURCE_DIR}/src
 )
 
-if(EMSCRIPTEN)
+if(USE_SYSTEM_DAWN)
+  target_link_libraries(webgpu_tools PUBLIC
+    ${dawn_LIBS}
+  )
+  
+  target_include_directories(webgpu_tools PUBLIC
+    ${dawn_INCLUDE_DIRS}
+  )
 
-elseif()
-  if(USE_SYSTEM_DAWN)
-    target_link_libraries(webgpu_tools PUBLIC
-      ${dawn_LIBS}
-    )
-    
-    target_include_directories(webgpu_tools PUBLIC
-      ${dawn_INCLUDE_DIRS}
-    )
-
-  else()
-    target_link_libraries(webgpu_tools PUBLIC
-      ${INSTALL_DIR}/install/lib/libdawn.a
-      "-framework Cocoa"
-      "-framework IOKit"
-      "-framework IOSurface"
-      "-framework QuartzCore"
-      "-framework Metal"
-    )
-
-    target_include_directories(webgpu_tools PUBLIC
-      ${INSTALL_DIR}/install/include/dawn-src/src
-      ${INSTALL_DIR}/install/include/dawn-src/include
-      ${INSTALL_DIR}/install/include/dawn-build/gen/include
-    )
-  endif()
 else()
+  target_link_libraries(webgpu_tools PUBLIC
+    ${INSTALL_DIR}/install/lib/libdawn.a
+    "-framework Cocoa"
+    "-framework IOKit"
+    "-framework IOSurface"
+    "-framework QuartzCore"
+    "-framework Metal"
+  )
+
+  target_include_directories(webgpu_tools PUBLIC
+    ${INSTALL_DIR}/install/include/dawn-src/src
+    ${INSTALL_DIR}/install/include/dawn-src/include
+    ${INSTALL_DIR}/install/include/dawn-build/gen/include
+  )
+endif()
 
 target_compile_definitions(webgpu_tools PUBLIC
   GLM_FORCE_SWIZZLE
