@@ -49,6 +49,7 @@ endif()
 
 add_library(webgpu_tools STATIC
   src/webgpu_tools/webgpu_utils.cpp
+  src/webgpu_tools/dawn_utils.cpp
   src/webgpu_tools/sdl3webgpu.mm
 )
 
@@ -69,7 +70,17 @@ target_include_directories(webgpu_tools PUBLIC
 )
 
 if(EMSCRIPTEN)
-  target_link_options(webgpu_tools PUBLIC "-sUSE_WEBGPU=1")
+  target_link_options(webgpu_tools PUBLIC
+    -gsource-map
+    -sALLOW_MEMORY_GROWTH
+    -sUSE_WEBGPU
+    -sASYNCIFY
+    # -fexceptions
+  )
+
+  # target_compile_options(webgpu_tools PUBLIC
+  #   -fexceptions
+  # )
 
 elseif()
   if(USE_SYSTEM_DAWN)

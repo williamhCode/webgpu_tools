@@ -7,6 +7,10 @@
 #include <sstream>
 #include <print>
 
+#if defined(__EMSCRIPTEN__)
+#include <emscripten/emscripten.h>
+#endif
+
 namespace wgpu::utils {
 
 using namespace wgpu;
@@ -33,7 +37,13 @@ Adapter RequestAdapter(const Instance& instance, RequestAdapterOptions const* op
 
   instance.RequestAdapter(options, onAdapterRequestEnded, &userData);
 
-  // assert(userData.requestEnded);
+#if defined(__EMSCRIPTEN__)
+  while (!userData.requestEnded) {
+    emscripten_sleep(100);
+  }
+#endif
+
+  assert(userData.requestEnded);
 
   return userData.adapter;
 }
@@ -60,7 +70,13 @@ Device RequestDevice(const Adapter& instance, DeviceDescriptor const* descriptor
 
   instance.RequestDevice(descriptor, onDeviceRequestEnded, &userData);
 
-  // assert(userData.requestEnded);
+#ifdef __EMSCRIPTEN__
+  while (!userData.requestEnded) {
+    emscripten_sleep(100);
+  }
+#endif
+
+  assert(userData.requestEnded);
 
   return userData.device;
 }
@@ -82,8 +98,13 @@ ShaderModule LoadShaderModule(const Device& device, const std::filesystem::path&
   }
   std::stringstream buffer;
   buffer << file.rdbuf();
+  auto source = buffer.str();
 
-  // return dawn::utils::CreateShaderModule(device, buffer.str());
+  wgpu::ShaderModuleWGSLDescriptor wgslDesc;
+  wgslDesc.code = source.c_str();
+  wgpu::ShaderModuleDescriptor descriptor;
+  descriptor.nextInChain = &wgslDesc;
+  return device.CreateShaderModule(&descriptor);
 }
 
 // clang-format off
@@ -344,7 +365,7 @@ RenderPipeline MakeRenderPipeline(const wgpu::Device &device, const utils::Rende
   }
 
   return device.CreateRenderPipeline(ToPtr(wgpu::RenderPipelineDescriptor{
-    // .layout = utils::MakePipelineLayout(device, desc.bgls),
+    .layout = utils::MakePipelineLayout(device, desc.bgls),
     .vertex{
       .module = desc.vs,
       .entryPoint = "vs_main",

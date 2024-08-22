@@ -1,11 +1,7 @@
 #pragma once
 
-// #if defined(__EMSCRIPTEN__)
-// #include <emscripten/emscripten.h>
-// #endif
-
 #include "webgpu/webgpu_cpp.h"
-// #include "dawn/utils/WGPUHelpers.h"
+#include "dawn_utils.hpp"
 #include "glm/ext/vector_uint2.hpp"
 #include "glm/ext/vector_uint3.hpp"
 #include <filesystem>
@@ -132,10 +128,10 @@ struct BlendState {
   };
 };
 
-// useful dawn utils
-// using dawn::utils::MakeBindGroup;
-// using dawn::utils::MakeBindGroupLayout;
-// using dawn::utils::MakePipelineLayout;
+// useful dawn utils (copied over cuz emscripeten dont have)
+using dawn::utils::MakeBindGroup;
+using dawn::utils::MakeBindGroupLayout;
+using dawn::utils::MakePipelineLayout;
 
 } // namespace wgpu::utils
 
