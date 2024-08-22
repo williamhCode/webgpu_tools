@@ -15,30 +15,36 @@ add_subdirectory(deps/glm-1.0.1)
 add_subdirectory(deps/stb)
 add_subdirectory(deps/magic_enum)
 
-if(DEFINED ENV{CMAKE_INSTALL_MODE})
-  set(ENV{CMAKE_INSTALL_MODE} REL_SYMLINK)
-endif()
+if(NOT EMSCRIPTEN)
+  if(DEFINED ENV{CMAKE_INSTALL_MODE})
+    set(ENV{CMAKE_INSTALL_MODE} REL_SYMLINK)
+  endif()
 
-if(DAWN_SYSTEM)
-  # use system dawn-single-lib
-  find_package(dawn REQUIRED)
-else()
-ExternalProject_Add(dawn-single-lib
-  GIT_REPOSITORY https://github.com/williamhCode/dawn-single-lib.git
-  GIT_TAG main
-  PREFIX ${PROJECT_SOURCE_DIR}/deps/dawn
+  option(USE_SYSTEM_DAWN "Use system installed dawn" OFF)
+  message(USE_SYSTEM_DAWN=${USE_SYSTEM_DAWN})
 
-  CMAKE_ARGS
-    -DCMAKE_INSTALL_PREFIX=${PROJECT_SOURCE_DIR}/deps/dawn/install
-    -DCMAKE_BUILD_TYPE=RelWithDebInfo
-    -GNinja
-    -DCMAKE_C_COMPILER=clang
-    -DCMAKE_CXX_COMPILER=clang++
+  if(USE_SYSTEM_DAWN)
+    # use system dawn-single-lib
+    find_package(dawn CONFIG REQUIRED)
+    message("dawn found=${dawn_FOUND}")
+  else()
+    message(CMAKE_TOOLCHAIN_FILE=${CMAKE_TOOLCHAIN_FILE})
 
-  USES_TERMINAL_BUILD ON
-  USES_TERMINAL_INSTALL ON
-)
-ExternalProject_Get_Property(dawn-single-lib INSTALL_DIR)
+    ExternalProject_Add(dawn-single-lib
+      GIT_REPOSITORY https://github.com/williamhCode/dawn-single-lib.git
+      GIT_TAG main
+      PREFIX ${PROJECT_SOURCE_DIR}/deps/dawn
+
+      CMAKE_ARGS
+        -DCMAKE_TOOLCHAIN_FILE=${CMAKE_TOOLCHAIN_FILE}
+        -DCMAKE_INSTALL_PREFIX=${PROJECT_SOURCE_DIR}/deps/dawn/install
+        -DCMAKE_BUILD_TYPE=RelWithDebInfo
+
+      USES_TERMINAL_BUILD ON
+      USES_TERMINAL_INSTALL ON
+    )
+    ExternalProject_Get_Property(dawn-single-lib INSTALL_DIR)
+  endif()
 endif()
 
 add_library(webgpu_tools STATIC
@@ -62,36 +68,38 @@ target_include_directories(webgpu_tools PUBLIC
   ${PROJECT_SOURCE_DIR}/src
 )
 
+if(EMSCRIPTEN)
 
-if(DAWN_SYSTEM)
-  target_link_libraries(webgpu_tools PUBLIC
-    dawn
-  )
-  
-  target_include_directories(webgpu_tools PUBLIC
-    ${dawn_INCLUDE_DIRS}
-  )
+elseif()
+  if(USE_SYSTEM_DAWN)
+    target_link_libraries(webgpu_tools PUBLIC
+      ${dawn_LIBS}
+    )
+    
+    target_include_directories(webgpu_tools PUBLIC
+      ${dawn_INCLUDE_DIRS}
+    )
 
+  else()
+    target_link_libraries(webgpu_tools PUBLIC
+      ${INSTALL_DIR}/install/lib/libdawn.a
+      "-framework Cocoa"
+      "-framework IOKit"
+      "-framework IOSurface"
+      "-framework QuartzCore"
+      "-framework Metal"
+    )
+
+    target_include_directories(webgpu_tools PUBLIC
+      ${INSTALL_DIR}/install/include/dawn-src/src
+      ${INSTALL_DIR}/install/include/dawn-src/include
+      ${INSTALL_DIR}/install/include/dawn-build/gen/include
+    )
+  endif()
 else()
-  target_link_libraries(webgpu_tools PUBLIC
-    ${INSTALL_DIR}/install/lib/libdawn.a
-    "-framework Cocoa"
-    "-framework IOKit"
-    "-framework IOSurface"
-    "-framework QuartzCore"
-    "-framework Metal"
-  )
-
-  target_include_directories(webgpu_tools PUBLIC
-    ${INSTALL_DIR}/install/include/dawn-src/src
-    ${INSTALL_DIR}/install/include/dawn-src/include
-    ${INSTALL_DIR}/install/include/dawn-build/gen/include
-  )
-endif()
 
 target_compile_definitions(webgpu_tools PUBLIC
   GLM_FORCE_SWIZZLE
   GLM_FORCE_DEPTH_ZERO_TO_ONE
   GLM_ENABLE_EXPERIMENTAL
 )
-
