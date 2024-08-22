@@ -52,7 +52,7 @@ set_target_properties(webgpu_tools PROPERTIES
 )
 
 target_link_libraries(webgpu_tools PUBLIC
-  SDL3::SDL3
+  SDL3::SDL3-static
   glm
   stb
   magic_enum::magic_enum
