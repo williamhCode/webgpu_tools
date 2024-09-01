@@ -193,68 +193,78 @@ void WriteTexture(
 wgpu::Texture CreateTexture(
   const wgpu::Device& device,
   wgpu::TextureUsage usage,
-  glm::uvec2 size,
-  wgpu::TextureFormat format,
+  const wgpu::utils::TextureDescriptor2D& desc,
   const void* data
 ) {
-  return CreateTexture(device, usage, {size.x, size.y, 1}, format, data);
-}
-
-wgpu::Texture CreateTexture(
-  const wgpu::Device& device,
-  wgpu::TextureUsage usage,
-  glm::uvec3 _size,
-  wgpu::TextureFormat format,
-  const void* data
-) {
-  wgpu::Extent3D size{_size.x, _size.y, _size.z};
-  TextureDescriptor textureDesc{
+  wgpu::TextureDescriptor textureDesc{
     .usage = TextureUsage::CopyDst | usage,
-    .size = size,
-    .format = format,
+    .size = Extent3D(desc.size.x, desc.size.y),
+    .format = desc.format,
+    .sampleCount = desc.sampleCount,
   };
   Texture texture = device.CreateTexture(&textureDesc);
   if (data) {
-    WriteTexture(device, texture, _size, data);
+    WriteTexture(device, texture, desc.size, data);
   }
   return texture;
 }
 
 wgpu::Texture CreateBindingTexture(
   const wgpu::Device& device,
-  glm::uvec2 size,
-  wgpu::TextureFormat format,
+  const wgpu::utils::TextureDescriptor2D& descriptor,
   const void* data
 ) {
-  return CreateTexture(device, TextureUsage::TextureBinding, size, format, data);
-}
-
-wgpu::Texture CreateBindingTexture(
-  const wgpu::Device& device,
-  glm::uvec3 size,
-  wgpu::TextureFormat format,
-  const void* data
-) {
-  return CreateTexture(device, TextureUsage::TextureBinding, size, format, data);
+  return CreateTexture(device, TextureUsage::TextureBinding, descriptor, data);
 }
 
 wgpu::Texture CreateRenderTexture(
   const wgpu::Device& device,
-  glm::uvec2 size,
-  wgpu::TextureFormat format,
+  const wgpu::utils::TextureDescriptor2D& descriptor,
   const void* data
 ) {
-  return CreateTexture(device, TextureUsage::RenderAttachment | TextureUsage::TextureBinding, size, format, data);
+  return CreateTexture(
+    device, TextureUsage::RenderAttachment | TextureUsage::TextureBinding, descriptor,
+    data
+  );
 }
 
-wgpu::Texture CreateRenderTexture(
-  const wgpu::Device& device,
-  glm::uvec3 size,
-  wgpu::TextureFormat format,
-  const void* data
-) {
-  return CreateTexture(device, TextureUsage::RenderAttachment | TextureUsage::TextureBinding, size, format, data);
-}
+// wgpu::Texture CreateTexture(
+//   const wgpu::Device& device,
+//   wgpu::TextureUsage usage,
+//   glm::uvec2 _size,
+//   wgpu::TextureFormat format,
+//   const void* data
+// ) {
+//   wgpu::Extent3D size{_size.x, _size.y};
+//   wgpu::TextureDescriptor textureDesc{
+//     .usage = TextureUsage::CopyDst | usage,
+//     .size = size,
+//     .format = format,
+//   };
+//   Texture texture = device.CreateTexture(&textureDesc);
+//   if (data) {
+//     WriteTexture(device, texture, _size, data);
+//   }
+//   return texture;
+// }
+
+// wgpu::Texture CreateBindingTexture(
+//   const wgpu::Device& device,
+//   glm::uvec2 size,
+//   wgpu::TextureFormat format,
+//   const void* data
+// ) {
+//   return CreateTexture(device, TextureUsage::TextureBinding, size, format, data);
+// }
+
+// wgpu::Texture CreateRenderTexture(
+//   const wgpu::Device& device,
+//   glm::uvec2 size,
+//   wgpu::TextureFormat format,
+//   const void* data
+// ) {
+//   return CreateTexture(device, TextureUsage::RenderAttachment | TextureUsage::TextureBinding, size, format, data);
+// }
 
 RenderPassDescriptor::RenderPassDescriptor(
   std::vector<wgpu::RenderPassColorAttachment> colorAttachments,
@@ -342,7 +352,7 @@ RenderPipeline MakeRenderPipeline(const wgpu::Device &device, const utils::Rende
     });
   }
 
-  return device.CreateRenderPipeline(ToPtr(wgpu::RenderPipelineDescriptor{
+  return device.CreateRenderPipeline(cPtr(wgpu::RenderPipelineDescriptor{
     .layout = utils::MakePipelineLayout(device, desc.bgls),
     .vertex{
       .module = desc.vs,
@@ -353,7 +363,7 @@ RenderPipeline MakeRenderPipeline(const wgpu::Device &device, const utils::Rende
     .primitive = desc.primitive,
     .depthStencil = desc.depthStencil.format == TextureFormat::Undefined ? nullptr : &desc.depthStencil,
     .multisample = desc.multisample,
-    .fragment = desc.fs ? ToPtr(FragmentState{
+    .fragment = desc.fs ? cPtr(FragmentState{
       .module = desc.fs,
       .entryPoint = "fs_main",
       .targetCount = desc.targets.size(),
