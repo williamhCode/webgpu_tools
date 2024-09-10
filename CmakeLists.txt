@@ -88,6 +88,7 @@ else()
   )
 
   target_include_directories(webgpu_tools PUBLIC
+    ${INSTALL_DIR}/install/include/dawn-src
     ${INSTALL_DIR}/install/include/dawn-src/src
     ${INSTALL_DIR}/install/include/dawn-src/include
     ${INSTALL_DIR}/install/include/dawn-build/gen/include
