@@ -65,16 +65,6 @@ Device RequestDevice(const Adapter& instance, DeviceDescriptor const* descriptor
   return userData.device;
 }
 
-void SetUncapturedErrorCallback(const Device& device) {
-  auto onUncapturedError = [](WGPUErrorType type, char const* message, void* userdata) {
-    std::cout << "Device error: type " << type;
-    if (message) std::cout << " (message: " << message << ")";
-    std::cout << "\n";
-  };
-
-  device.SetUncapturedErrorCallback(onUncapturedError, nullptr);
-}
-
 ShaderModule LoadShaderModule(const Device& device, const std::filesystem::path& path) {
   std::ifstream file(path);
   if (!file.is_open()) {
