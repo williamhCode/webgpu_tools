@@ -15,12 +15,21 @@ add_subdirectory(deps/magic_enum)
 
 if(NOT EMSCRIPTEN)
   include(FetchContent)
-  FetchContent_Declare(
-    dawn
-    URL https://github.com/williamhCode/dawn-single-lib/releases/download/chromium%2F6700/dawn-osx-arm.zip
-    SOURCE_DIR ${PROJECT_SOURCE_DIR}/deps/dawn/dawn-src
-    SUBBUILD_DIR ${PROJECT_SOURCE_DIR}/deps/dawn/dawn-subbuild
-  )
+  if(XCODE) 
+    FetchContent_Declare(
+      dawn
+      URL https://github.com/williamhCode/dawn-single-lib/releases/download/chromium%2F6700/dawn-osx-arm.zip
+      SOURCE_DIR ${PROJECT_SOURCE_DIR}/deps/dawn/dawn-src
+      SUBBUILD_DIR ${PROJECT_SOURCE_DIR}/deps/dawn/dawn-subbuild-xcode
+    )
+  else()
+    FetchContent_Declare(
+      dawn
+      URL https://github.com/williamhCode/dawn-single-lib/releases/download/chromium%2F6700/dawn-osx-arm.zip
+      SOURCE_DIR ${PROJECT_SOURCE_DIR}/deps/dawn/dawn-src
+      SUBBUILD_DIR ${PROJECT_SOURCE_DIR}/deps/dawn/dawn-subbuild
+    )
+  endif()
   FetchContent_MakeAvailable(dawn)
   find_package(dawn CONFIG REQUIRED PATHS ${dawn_SOURCE_DIR})
 endif()
