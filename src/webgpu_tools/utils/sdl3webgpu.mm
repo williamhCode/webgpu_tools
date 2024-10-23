@@ -19,7 +19,7 @@ wgpu::Surface SDL_GetWGPUSurface(const wgpu::Instance& instance, SDL_Window* win
     wgpu::SurfaceDescriptorFromMetalLayer desc;
     desc.layer = metal_layer;
 
-    return instance.CreateSurface(cPtr(wgpu::SurfaceDescriptor{
+    return instance.CreateSurface(ToPtr(wgpu::SurfaceDescriptor{
       .nextInChain = &desc,
     }));
   }

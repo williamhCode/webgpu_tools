@@ -11,31 +11,25 @@ namespace wgpu::utils {
 
 using namespace wgpu;
 
-Adapter RequestAdapter(const Instance& instance, RequestAdapterOptions const* options) {
-  struct UserData {
-    WGPUAdapter adapter = nullptr;
-    bool requestEnded = false;
+Adapter RequestAdapter(Instance& instance, const RequestAdapterOptions& options) {
+  wgpu::Adapter adapter;
+  wgpu::RequestAdapterCallbackInfo callbackInfo{
+    .mode = wgpu::CallbackMode::WaitAnyOnly,
+    .callback = [](
+      WGPURequestAdapterStatus status, WGPUAdapter adapter,
+      const char* message, void* userdata
+    ) {
+      if (status != WGPURequestAdapterStatus_Success) {
+        std::cerr << "Failed to get an adapter:" << message;
+        return;
+      }
+      *static_cast<wgpu::Adapter *>(userdata) = wgpu::Adapter::Acquire(adapter);
+    },
+    .userdata = &adapter,
   };
-  UserData userData;
+  instance.WaitAny(instance.RequestAdapter(&options, callbackInfo), UINT64_MAX);
 
-  auto onAdapterRequestEnded = [](
-                                 WGPURequestAdapterStatus status, WGPUAdapter adapter,
-                                 char const* message, void* pUserData
-                               ) {
-    UserData& userData = *static_cast<UserData*>(pUserData);
-    if (status == WGPURequestAdapterStatus_Success) {
-      userData.adapter = adapter;
-    } else {
-      std::cout << "Could not get WebGPU adapter: " << message << "\n";
-    }
-    userData.requestEnded = true;
-  };
-
-  instance.RequestAdapter(options, onAdapterRequestEnded, &userData);
-
-  // assert(userData.requestEnded);
-
-  return userData.adapter;
+  return adapter;
 }
 
 Device RequestDevice(const Adapter& instance, DeviceDescriptor const* descriptor) {
@@ -342,7 +336,7 @@ RenderPipeline MakeRenderPipeline(const wgpu::Device &device, const utils::Rende
     });
   }
 
-  return device.CreateRenderPipeline(cPtr(wgpu::RenderPipelineDescriptor{
+  return device.CreateRenderPipeline(ToPtr(wgpu::RenderPipelineDescriptor{
     .layout = utils::MakePipelineLayout(device, desc.bgls),
     .vertex{
       .module = desc.vs,
@@ -353,7 +347,7 @@ RenderPipeline MakeRenderPipeline(const wgpu::Device &device, const utils::Rende
     .primitive = desc.primitive,
     .depthStencil = desc.depthStencil.format == TextureFormat::Undefined ? nullptr : &desc.depthStencil,
     .multisample = desc.multisample,
-    .fragment = desc.fs ? cPtr(FragmentState{
+    .fragment = desc.fs ? ToPtr(FragmentState{
       .module = desc.fs,
       .entryPoint = "fs_main",
       .targetCount = desc.targets.size(),

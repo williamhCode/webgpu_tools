@@ -9,7 +9,7 @@
 
 namespace wgpu::utils {
 
-wgpu::Adapter RequestAdapter(const wgpu::Instance &instance, const wgpu::RequestAdapterOptions *options);
+wgpu::Adapter RequestAdapter(wgpu::Instance& instance, const wgpu::RequestAdapterOptions& options);
 
 wgpu::Device RequestDevice(const wgpu::Adapter &instance, const wgpu::DeviceDescriptor *descriptor);
 
@@ -138,7 +138,7 @@ using dawn::utils::MakePipelineLayout;
 } // namespace wgpu::utils
 
 template <typename T>
-const T* cPtr(T&& value) {
+const T* ToPtr(T&& value) {
   return &value;
 }
 
