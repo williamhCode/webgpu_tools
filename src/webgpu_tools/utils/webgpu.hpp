@@ -11,7 +11,7 @@ namespace wgpu::utils {
 
 wgpu::Adapter RequestAdapter(wgpu::Instance& instance, const wgpu::RequestAdapterOptions& options);
 
-wgpu::Device RequestDevice(const wgpu::Adapter &instance, const wgpu::DeviceDescriptor *descriptor);
+wgpu::Device RequestDevice(const wgpu::Adapter& adapter, const wgpu::DeviceDescriptor& descriptor);
 
 void SetUncapturedErrorCallback(const wgpu::Device &device);
 

@@ -13,50 +13,49 @@ using namespace wgpu;
 
 Adapter RequestAdapter(Instance& instance, const RequestAdapterOptions& options) {
   wgpu::Adapter adapter;
-  wgpu::RequestAdapterCallbackInfo callbackInfo{
-    .mode = wgpu::CallbackMode::WaitAnyOnly,
-    .callback = [](
-      WGPURequestAdapterStatus status, WGPUAdapter adapter,
-      const char* message, void* userdata
-    ) {
-      if (status != WGPURequestAdapterStatus_Success) {
-        std::cerr << "Failed to get an adapter:" << message;
-        return;
-      }
-      *static_cast<wgpu::Adapter *>(userdata) = wgpu::Adapter::Acquire(adapter);
-    },
-    .userdata = &adapter,
-  };
-  instance.WaitAny(instance.RequestAdapter(&options, callbackInfo), UINT64_MAX);
+  instance.WaitAny(
+    instance.RequestAdapter(
+      &options, wgpu::CallbackMode::WaitAnyOnly,
+      [](
+        wgpu::RequestAdapterStatus status, wgpu::Adapter result,
+        wgpu::StringView message, wgpu::Adapter* userdata
+      ) {
+        if (status != wgpu::RequestAdapterStatus::Success) {
+          std::cout << "Could not get WebGPU adapter: " << message.data << "\n";
+          return;
+        }
+        *userdata = std::move(result);
+      },
+      &adapter
+    ),
+    UINT64_MAX
+  );
 
   return adapter;
 }
 
-Device RequestDevice(const Adapter& instance, DeviceDescriptor const* descriptor) {
-  struct UserData {
-    WGPUDevice device = nullptr;
-    bool requestEnded = false;
-  };
-  UserData userData;
+Device RequestDevice(const Adapter& adapter, const DeviceDescriptor& descriptor) {
+  auto instance = adapter.GetInstance();
+  wgpu::Device device;
+  instance.WaitAny(
+    adapter.RequestDevice(
+      &descriptor, wgpu::CallbackMode::WaitAnyOnly,
+      [](
+        wgpu::RequestDeviceStatus status, wgpu::Device result, wgpu::StringView message,
+        wgpu::Device* userdata
+      ) {
+        if (status != wgpu::RequestDeviceStatus::Success) {
+          std::cout << "Could not get WebGPU device: " << message.data << "\n";
+          return;
+        }
+        *userdata = std::move(result);
+      },
+      &device
+    ),
+    UINT64_MAX
+  );
 
-  auto onDeviceRequestEnded = [](
-                                WGPURequestDeviceStatus status, WGPUDevice device,
-                                char const* message, void* pUserData
-                              ) {
-    UserData& userData = *static_cast<UserData*>(pUserData);
-    if (status == WGPURequestDeviceStatus_Success) {
-      userData.device = device;
-    } else {
-      std::cout << "Could not get WebGPU adapter: " << message << "\n";
-    }
-    userData.requestEnded = true;
-  };
-
-  instance.RequestDevice(descriptor, onDeviceRequestEnded, &userData);
-
-  // assert(userData.requestEnded);
-
-  return userData.device;
+  return device;
 }
 
 ShaderModule LoadShaderModule(const Device& device, const std::filesystem::path& path) {
