@@ -28,8 +28,9 @@ if(NOT EMSCRIPTEN)
 endif()
 
 add_library(webgpu_tools STATIC
-  src/webgpu_tools/utils/webgpu.cpp
-  src/webgpu_tools/utils/sdl3webgpu.mm
+  src/webgpu_tools/webgpu_utils.cpp
+  src/webgpu_tools/dawn_utils.cpp
+  src/webgpu_tools/sdl3webgpu.mm
 )
 
 set_target_properties(webgpu_tools PROPERTIES
@@ -60,6 +61,20 @@ target_include_directories(webgpu_tools PUBLIC
   ${PROJECT_SOURCE_DIR}/src
   ${dawn_INCLUDE_DIRS}
 )
+
+if(EMSCRIPTEN)
+  target_link_options(webgpu_tools PUBLIC
+    -gsource-map
+    -sALLOW_MEMORY_GROWTH
+    -sUSE_WEBGPU
+    -sASYNCIFY
+    # -fexceptions
+  )
+
+  # target_compile_options(webgpu_tools PUBLIC
+  #   -fexceptions
+  # )
+endif()
 
 target_compile_definitions(webgpu_tools PUBLIC
   GLM_FORCE_SWIZZLE

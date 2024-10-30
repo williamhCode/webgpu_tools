@@ -1,7 +1,7 @@
 #pragma once
 
 #include "webgpu/webgpu_cpp.h"
-#include "dawn/utils/WGPUHelpers.h"
+#include "dawn_utils.hpp"
 #include "glm/ext/vector_uint2.hpp"
 #include "glm/ext/vector_uint3.hpp"
 #include <filesystem>
@@ -12,8 +12,6 @@ namespace wgpu::utils {
 wgpu::Adapter RequestAdapter(wgpu::Instance& instance, const wgpu::RequestAdapterOptions& options);
 
 wgpu::Device RequestDevice(const wgpu::Adapter& adapter, const wgpu::DeviceDescriptor& descriptor);
-
-void SetUncapturedErrorCallback(const wgpu::Device &device);
 
 wgpu::ShaderModule LoadShaderModule(const wgpu::Device &device, const std::filesystem::path &path);
 
@@ -130,7 +128,7 @@ struct BlendState {
   };
 };
 
-// useful dawn utils
+// useful dawn utils (copied over cuz emscripeten dont have)
 using dawn::utils::MakeBindGroup;
 using dawn::utils::MakeBindGroupLayout;
 using dawn::utils::MakePipelineLayout;

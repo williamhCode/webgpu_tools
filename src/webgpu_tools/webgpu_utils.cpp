@@ -1,4 +1,4 @@
-#include "webgpu.hpp"
+#include "webgpu_utils.hpp"
 #include "glm/fwd.hpp"
 #include "webgpu/webgpu_cpp.h"
 #include "magic_enum.hpp"
@@ -6,6 +6,10 @@
 #include <fstream>
 #include <sstream>
 #include <print>
+
+#if defined(__EMSCRIPTEN__)
+#include <emscripten/emscripten.h>
+#endif
 
 namespace wgpu::utils {
 
@@ -32,6 +36,28 @@ Adapter RequestAdapter(Instance& instance, const RequestAdapterOptions& options)
   );
 
   return adapter;
+
+// #if defined(__EMSCRIPTEN__)
+//   auto onAdapterRequestEnded = [](
+//                                  WGPURequestAdapterStatus status, WGPUAdapter adapter,
+//                                  char const* message, void* pUserData
+//                                ) {
+//     UserData& userData = *static_cast<UserData*>(pUserData);
+//     if (status == WGPURequestAdapterStatus_Success) {
+//       userData.adapter = adapter;
+//     } else {
+//       std::cout << "Could not get WebGPU adapter: " << message << "\n";
+//     }
+//     userData.requestEnded = true;
+//   };
+
+//   instance.RequestAdapter(options, onAdapterRequestEnded, &userData);
+
+//   while (!userData.requestEnded) {
+//     emscripten_sleep(100);
+//   }
+//   return userData.adapter;
+// #endif
 }
 
 Device RequestDevice(const Adapter& adapter, const DeviceDescriptor& descriptor) {
@@ -56,6 +82,29 @@ Device RequestDevice(const Adapter& adapter, const DeviceDescriptor& descriptor)
   );
 
   return device;
+
+// #ifdef __EMSCRIPTEN__
+//   auto onDeviceRequestEnded = [](
+//                                 WGPURequestDeviceStatus status, WGPUDevice device,
+//                                 char const* message, void* pUserData
+//                               ) {
+//     UserData& userData = *static_cast<UserData*>(pUserData);
+//     if (status == WGPURequestDeviceStatus_Success) {
+//       userData.device = device;
+//     } else {
+//       std::cout << "Could not get WebGPU adapter: " << message << "\n";
+//     }
+//     userData.requestEnded = true;
+//   };
+
+//   instance.RequestDevice(descriptor, onDeviceRequestEnded, &userData);
+
+//   while (!userData.requestEnded) {
+//     emscripten_sleep(100);
+//   }
+
+//   return userData.device;
+// #endif
 }
 
 ShaderModule LoadShaderModule(const Device& device, const std::filesystem::path& path) {
@@ -65,8 +114,13 @@ ShaderModule LoadShaderModule(const Device& device, const std::filesystem::path&
   }
   std::stringstream buffer;
   buffer << file.rdbuf();
+  auto source = buffer.str();
 
-  return dawn::utils::CreateShaderModule(device, buffer.str());
+  wgpu::ShaderModuleWGSLDescriptor wgslDesc;
+  wgslDesc.code = source.c_str();
+  wgpu::ShaderModuleDescriptor descriptor;
+  descriptor.nextInChain = &wgslDesc;
+  return device.CreateShaderModule(&descriptor);
 }
 
 // clang-format off
@@ -160,7 +214,8 @@ void WriteTexture(
   const void* data
 ) {
   wgpu::Extent3D size{_size.x, _size.y, _size.z};
-  auto texelBlockSize = dawn::utils::GetTexelBlockSizeInBytes(texture.GetFormat());
+  // auto texelBlockSize = dawn::utils::GetTexelBlockSizeInBytes(texture.GetFormat());
+  int texelBlockSize = 1;
   ImageCopyTexture destination{
     .texture = texture,
   };

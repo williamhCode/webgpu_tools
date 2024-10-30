@@ -1,6 +1,6 @@
 #include "SDL3/SDL.h"
 #include "sdl3webgpu.h"
-#include "webgpu_tools/utils/webgpu.hpp"
+#include "webgpu_tools/webgpu_utils.hpp"
 
 #if defined(SDL_PLATFORM_MACOS)
 #include <Cocoa/Cocoa.h>
@@ -9,7 +9,9 @@
 #endif
 
 wgpu::Surface SDL_GetWGPUSurface(const wgpu::Instance& instance, SDL_Window* window) {
-#if defined(SDL_PLATFORM_MACOS)
+#if defined(SDL_PLATFORM_EMSCRIPTEN)
+  assert(false && "dont use this for emscripten");
+#elif defined(SDL_PLATFORM_MACOS)
   {
     NSWindow *nswindow = (__bridge NSWindow *)SDL_GetPointerProperty(SDL_GetWindowProperties(window), SDL_PROP_WINDOW_COCOA_WINDOW_POINTER, NULL);
     [nswindow.contentView setWantsLayer:YES];
@@ -87,7 +89,6 @@ wgpu::Surface SDL_GetWGPUSurface(const wgpu::Instance& instance, SDL_Window* win
 //         },
 //     });
 //   }
-#else
 #error "Unsupported Target"
 #endif
 }
