@@ -11,68 +11,51 @@ namespace wgpu::utils {
 
 using namespace wgpu;
 
-Adapter RequestAdapter(const Instance& instance, RequestAdapterOptions const* options) {
-  struct UserData {
-    WGPUAdapter adapter = nullptr;
-    bool requestEnded = false;
-  };
-  UserData userData;
+Adapter RequestAdapter(Instance& instance, const RequestAdapterOptions& options) {
+  wgpu::Adapter adapter;
+  instance.WaitAny(
+    instance.RequestAdapter(
+      &options, wgpu::CallbackMode::WaitAnyOnly,
+      [](
+        wgpu::RequestAdapterStatus status, wgpu::Adapter result,
+        wgpu::StringView message, wgpu::Adapter* userdata
+      ) {
+        if (status != wgpu::RequestAdapterStatus::Success) {
+          std::cout << "Could not get WebGPU adapter: " << message.data << "\n";
+          return;
+        }
+        *userdata = std::move(result);
+      },
+      &adapter
+    ),
+    UINT64_MAX
+  );
 
-  auto onAdapterRequestEnded = [](
-                                 WGPURequestAdapterStatus status, WGPUAdapter adapter,
-                                 char const* message, void* pUserData
-                               ) {
-    UserData& userData = *static_cast<UserData*>(pUserData);
-    if (status == WGPURequestAdapterStatus_Success) {
-      userData.adapter = adapter;
-    } else {
-      std::cout << "Could not get WebGPU adapter: " << message << "\n";
-    }
-    userData.requestEnded = true;
-  };
-
-  instance.RequestAdapter(options, onAdapterRequestEnded, &userData);
-
-  // assert(userData.requestEnded);
-
-  return userData.adapter;
+  return adapter;
 }
 
-Device RequestDevice(const Adapter& instance, DeviceDescriptor const* descriptor) {
-  struct UserData {
-    WGPUDevice device = nullptr;
-    bool requestEnded = false;
-  };
-  UserData userData;
+Device RequestDevice(const Adapter& adapter, const DeviceDescriptor& descriptor) {
+  auto instance = adapter.GetInstance();
+  wgpu::Device device;
+  instance.WaitAny(
+    adapter.RequestDevice(
+      &descriptor, wgpu::CallbackMode::WaitAnyOnly,
+      [](
+        wgpu::RequestDeviceStatus status, wgpu::Device result, wgpu::StringView message,
+        wgpu::Device* userdata
+      ) {
+        if (status != wgpu::RequestDeviceStatus::Success) {
+          std::cout << "Could not get WebGPU device: " << message.data << "\n";
+          return;
+        }
+        *userdata = std::move(result);
+      },
+      &device
+    ),
+    UINT64_MAX
+  );
 
-  auto onDeviceRequestEnded = [](
-                                WGPURequestDeviceStatus status, WGPUDevice device,
-                                char const* message, void* pUserData
-                              ) {
-    UserData& userData = *static_cast<UserData*>(pUserData);
-    if (status == WGPURequestDeviceStatus_Success) {
-      userData.device = device;
-    } else {
-      std::cout << "Could not get WebGPU adapter: " << message << "\n";
-    }
-    userData.requestEnded = true;
-  };
-
-  instance.RequestDevice(descriptor, onDeviceRequestEnded, &userData);
-
-  // assert(userData.requestEnded);
-
-  return userData.device;
-}
-
-void SetUncapturedErrorCallback(const Device& device) {
-  auto onUncapturedError = [](WGPUErrorType type, char const* message, void* userdata) {
-    std::cout << "Device error: type " << type;
-    if (message) std::cout << " (message: " << message << ")";
-    std::cout << "\n";
-  };
-
-  device.SetUncapturedErrorCallback(onUncapturedError, nullptr);
+  return device;
 }
 
 ShaderModule LoadShaderModule(const Device& device, const std::filesystem::path& path) {
@@ -193,68 +176,78 @@ void WriteTexture(
 wgpu::Texture CreateTexture(
   const wgpu::Device& device,
   wgpu::TextureUsage usage,
-  glm::uvec2 size,
-  wgpu::TextureFormat format,
+  const wgpu::utils::TextureDescriptor2D& desc,
   const void* data
 ) {
-  return CreateTexture(device, usage, {size.x, size.y, 1}, format, data);
-}
-
-wgpu::Texture CreateTexture(
-  const wgpu::Device& device,
-  wgpu::TextureUsage usage,
-  glm::uvec3 _size,
-  wgpu::TextureFormat format,
-  const void* data
-) {
-  wgpu::Extent3D size{_size.x, _size.y, _size.z};
-  TextureDescriptor textureDesc{
+  wgpu::TextureDescriptor textureDesc{
     .usage = TextureUsage::CopyDst | usage,
-    .size = size,
-    .format = format,
+    .size = Extent3D(desc.size.x, desc.size.y),
+    .format = desc.format,
+    .sampleCount = desc.sampleCount,
   };
   Texture texture = device.CreateTexture(&textureDesc);
   if (data) {
-    WriteTexture(device, texture, _size, data);
+    WriteTexture(device, texture, desc.size, data);
   }
   return texture;
 }
 
 wgpu::Texture CreateBindingTexture(
   const wgpu::Device& device,
-  glm::uvec2 size,
-  wgpu::TextureFormat format,
+  const wgpu::utils::TextureDescriptor2D& descriptor,
   const void* data
 ) {
-  return CreateTexture(device, TextureUsage::TextureBinding, size, format, data);
-}
-
-wgpu::Texture CreateBindingTexture(
-  const wgpu::Device& device,
-  glm::uvec3 size,
-  wgpu::TextureFormat format,
-  const void* data
-) {
-  return CreateTexture(device, TextureUsage::TextureBinding, size, format, data);
+  return CreateTexture(device, TextureUsage::TextureBinding, descriptor, data);
 }
 
 wgpu::Texture CreateRenderTexture(
   const wgpu::Device& device,
-  glm::uvec2 size,
-  wgpu::TextureFormat format,
+  const wgpu::utils::TextureDescriptor2D& descriptor,
   const void* data
 ) {
-  return CreateTexture(device, TextureUsage::RenderAttachment | TextureUsage::TextureBinding, size, format, data);
+  return CreateTexture(
+    device, TextureUsage::RenderAttachment | TextureUsage::TextureBinding, descriptor,
+    data
+  );
 }
 
-wgpu::Texture CreateRenderTexture(
-  const wgpu::Device& device,
-  glm::uvec3 size,
-  wgpu::TextureFormat format,
-  const void* data
-) {
-  return CreateTexture(device, TextureUsage::RenderAttachment | TextureUsage::TextureBinding, size, format, data);
-}
+// wgpu::Texture CreateTexture(
+//   const wgpu::Device& device,
+//   wgpu::TextureUsage usage,
+//   glm::uvec2 _size,
+//   wgpu::TextureFormat format,
+//   const void* data
+// ) {
+//   wgpu::Extent3D size{_size.x, _size.y};
+//   wgpu::TextureDescriptor textureDesc{
+//     .usage = TextureUsage::CopyDst | usage,
+//     .size = size,
+//     .format = format,
+//   };
+//   Texture texture = device.CreateTexture(&textureDesc);
+//   if (data) {
+//     WriteTexture(device, texture, _size, data);
+//   }
+//   return texture;
+// }
+
+// wgpu::Texture CreateBindingTexture(
+//   const wgpu::Device& device,
+//   glm::uvec2 size,
+//   wgpu::TextureFormat format,
+//   const void* data
+// ) {
+//   return CreateTexture(device, TextureUsage::TextureBinding, size, format, data);
+// }
+
+// wgpu::Texture CreateRenderTexture(
+//   const wgpu::Device& device,
+//   glm::uvec2 size,
+//   wgpu::TextureFormat format,
+//   const void* data
+// ) {
+//   return CreateTexture(device, TextureUsage::RenderAttachment | TextureUsage::TextureBinding, size, format, data);
+// }
 
 RenderPassDescriptor::RenderPassDescriptor(
   std::vector<wgpu::RenderPassColorAttachment> colorAttachments,

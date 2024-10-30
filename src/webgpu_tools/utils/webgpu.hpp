@@ -9,10 +9,9 @@
 
 namespace wgpu::utils {
 
-// clang-format off
-wgpu::Adapter RequestAdapter(const wgpu::Instance &instance, const wgpu::RequestAdapterOptions *options);
+wgpu::Adapter RequestAdapter(wgpu::Instance& instance, const wgpu::RequestAdapterOptions& options);
 
-wgpu::Device RequestDevice(const wgpu::Adapter &instance, const wgpu::DeviceDescriptor *descriptor);
+wgpu::Device RequestDevice(const wgpu::Adapter& adapter, const wgpu::DeviceDescriptor& descriptor);
 
 void SetUncapturedErrorCallback(const wgpu::Device &device);
 
@@ -29,12 +28,16 @@ wgpu::Buffer CreateStorageBuffer(const wgpu::Device &device, uint64_t size, cons
 
 void WriteTexture(const wgpu::Device &device, const wgpu::Texture &texture, glm::uvec2 size, const void *data);
 void WriteTexture(const wgpu::Device &device, const wgpu::Texture &texture, glm::uvec3 size, const void *data);
-wgpu::Texture CreateTexture(const wgpu::Device& device, wgpu::TextureUsage usage, glm::uvec2 size, wgpu::TextureFormat format, const void* data);
-wgpu::Texture CreateTexture(const wgpu::Device& device, wgpu::TextureUsage usage, glm::uvec3 size, wgpu::TextureFormat format, const void* data);
-wgpu::Texture CreateBindingTexture(const wgpu::Device &device, glm::uvec2 size, wgpu::TextureFormat format, const void *data = nullptr);
-wgpu::Texture CreateBindingTexture(const wgpu::Device &device, glm::uvec3 size, wgpu::TextureFormat format, const void *data = nullptr);
-wgpu::Texture CreateRenderTexture(const wgpu::Device &device, glm::uvec2 size, wgpu::TextureFormat format, const void *data = nullptr);
-wgpu::Texture CreateRenderTexture(const wgpu::Device &device, glm::uvec3 size, wgpu::TextureFormat format, const void *data = nullptr);
+
+// NOTE: add more options when needed
+struct TextureDescriptor2D {
+  glm::uvec2 size;
+  wgpu::TextureFormat format;
+  uint32_t sampleCount = 1;
+};
+wgpu::Texture CreateTexture(const wgpu::Device& device, wgpu::TextureUsage usage, const wgpu::utils::TextureDescriptor2D& desc, const void* data = nullptr);
+wgpu::Texture CreateBindingTexture(const wgpu::Device& device, const wgpu::utils::TextureDescriptor2D& desc, const void* data = nullptr);
+wgpu::Texture CreateRenderTexture(const wgpu::Device& device, const wgpu::utils::TextureDescriptor2D& desc, const void* data = nullptr);
 
 struct RenderPassDescriptor : public wgpu::RenderPassDescriptor{
   RenderPassDescriptor(
@@ -91,7 +94,6 @@ struct RenderPipelineDescriptor{
 };
 
 wgpu::RenderPipeline MakeRenderPipeline(const wgpu::Device &device, const utils::RenderPipelineDescriptor &descriptor);
-// clang-format on
 
 struct BlendComponent {
   static constexpr wgpu::BlendComponent Replace = {
@@ -136,11 +138,11 @@ using dawn::utils::MakePipelineLayout;
 } // namespace wgpu::utils
 
 template <typename T>
-const T* ToPtr(const T&& value) {
+const T* ToPtr(T&& value) {
   return &value;
 }
 
-template <typename T, size_t N>
-constexpr const T* ToPtr(const T (&&a)[N]) {
-  return a;
-}
+// template <typename T, size_t N>
+// constexpr const T* ToPtr(const T (&&a)[N]) {
+//   return a;
+// }
