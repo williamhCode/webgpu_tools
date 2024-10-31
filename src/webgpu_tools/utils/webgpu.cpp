@@ -1,4 +1,4 @@
-#include "webgpu_utils.hpp"
+#include "./webgpu.hpp"
 #include "glm/fwd.hpp"
 #include "webgpu/webgpu_cpp.h"
 #include "magic_enum.hpp"
@@ -214,8 +214,7 @@ void WriteTexture(
   const void* data
 ) {
   wgpu::Extent3D size{_size.x, _size.y, _size.z};
-  // auto texelBlockSize = dawn::utils::GetTexelBlockSizeInBytes(texture.GetFormat());
-  int texelBlockSize = 1;
+  auto texelBlockSize = dawn::utils::GetTexelBlockSizeInBytes(texture.GetFormat());
   ImageCopyTexture destination{
     .texture = texture,
   };

@@ -1,7 +1,7 @@
 #pragma once
 
 #include "webgpu/webgpu_cpp.h"
-#include "dawn_utils.hpp"
+#include "./dawn.hpp"
 #include "glm/ext/vector_uint2.hpp"
 #include "glm/ext/vector_uint3.hpp"
 #include <filesystem>
