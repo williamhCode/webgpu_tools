@@ -1,7 +1,7 @@
 #include "./webgpu.hpp"
 #include "glm/fwd.hpp"
 #include "webgpu/webgpu_cpp.h"
-#include "magic_enum.hpp"
+#include "dawn/webgpu_cpp_print.h"
 #include <iostream>
 #include <fstream>
 #include <sstream>
@@ -14,6 +14,10 @@
 namespace wgpu::utils {
 
 using namespace wgpu;
+
+static std::string ToString(auto&& obj) {
+  return (std::ostringstream() << obj).str();
+}
 
 Adapter RequestAdapter(Instance& instance, const RequestAdapterOptions& options) {
   wgpu::Adapter adapter;
@@ -162,13 +166,13 @@ void PrintLimits(const wgpu::Limits &limits) {
 
 void PrintSurfaceCapabilities(const SurfaceCapabilities& config) {
   for (size_t i = 0; i < config.formatCount; i++) {
-    std::println("Format: {}", magic_enum::enum_name(config.formats[i]));
+    std::println("Format: {}", ToString(config.formats[i]));
   }
   for (size_t i = 0; i < config.presentModeCount; i++) {
-    std::println("Present Mode: {}", magic_enum::enum_name(config.presentModes[i]));
+    std::println("Present Mode: {}", ToString(config.presentModes[i]));
   }
   for (size_t i = 0; i < config.alphaModeCount; i++) {
-    std::println("Alpha Mode: {}", magic_enum::enum_name(config.alphaModes[i]));
+    std::println("Alpha Mode: {}", ToString(config.alphaModes[i]));
   }
 }
 
