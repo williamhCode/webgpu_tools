@@ -4,6 +4,7 @@
 #include "dawn/webgpu_cpp_print.h"
 #include <iostream>
 #include <fstream>
+#include <limits>
 #include <sstream>
 #include <print>
 
@@ -36,7 +37,7 @@ Adapter RequestAdapter(Instance& instance, const RequestAdapterOptions& options)
       },
       &adapter
     ),
-    UINT64_MAX
+    std::numeric_limits<uint64_t>::max()
   );
 
   return adapter;
@@ -82,7 +83,7 @@ Device RequestDevice(const Adapter& adapter, const DeviceDescriptor& descriptor)
       },
       &device
     ),
-    UINT64_MAX
+    std::numeric_limits<uint64_t>::max()
   );
 
   return device;
