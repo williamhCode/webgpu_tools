@@ -112,22 +112,6 @@ Device RequestDevice(const Adapter& adapter, const DeviceDescriptor& descriptor)
 // #endif
 }
 
-ShaderModule LoadShaderModule(const Device& device, const std::filesystem::path& path) {
-  std::ifstream file(path);
-  if (!file.is_open()) {
-    throw std::runtime_error("Could not open shader file" + path.string());
-  }
-  std::stringstream buffer;
-  buffer << file.rdbuf();
-  auto source = buffer.str();
-
-  wgpu::ShaderModuleWGSLDescriptor wgslDesc;
-  wgslDesc.code = source.c_str();
-  wgpu::ShaderModuleDescriptor descriptor;
-  descriptor.nextInChain = &wgslDesc;
-  return device.CreateShaderModule(&descriptor);
-}
-
 // clang-format off
 void PrintLimits(const wgpu::Limits &limits) {
   std::cout << " - maxTextureDimension1D: " << limits.maxTextureDimension1D << "\n";
@@ -175,6 +159,22 @@ void PrintSurfaceCapabilities(const SurfaceCapabilities& config) {
   for (size_t i = 0; i < config.alphaModeCount; i++) {
     std::println("Alpha Mode: {}", ToString(config.alphaModes[i]));
   }
+}
+
+ShaderModule LoadShaderModule(const Device& device, const std::filesystem::path& path) {
+  std::ifstream file(path);
+  if (!file.is_open()) {
+    throw std::runtime_error("Could not open shader file" + path.string());
+  }
+  std::stringstream buffer;
+  buffer << file.rdbuf();
+  auto source = buffer.str();
+
+  wgpu::ShaderModuleWGSLDescriptor wgslDesc;
+  wgslDesc.code = source.c_str();
+  wgpu::ShaderModuleDescriptor descriptor;
+  descriptor.nextInChain = &wgslDesc;
+  return device.CreateShaderModule(&descriptor);
 }
 
 wgpu::Buffer CreateBuffer(const wgpu::Device& device, wgpu::BufferUsage usage, uint64_t size, const void* data) {

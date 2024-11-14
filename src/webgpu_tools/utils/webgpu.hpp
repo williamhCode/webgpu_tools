@@ -13,10 +13,10 @@ wgpu::Adapter RequestAdapter(wgpu::Instance& instance, const wgpu::RequestAdapte
 
 wgpu::Device RequestDevice(const wgpu::Adapter& adapter, const wgpu::DeviceDescriptor& descriptor);
 
-wgpu::ShaderModule LoadShaderModule(const wgpu::Device &device, const std::filesystem::path &path);
-
 void PrintLimits(const wgpu::Limits& limits);
 void PrintSurfaceCapabilities(const SurfaceCapabilities& config);
+
+wgpu::ShaderModule LoadShaderModule(const wgpu::Device &device, const std::filesystem::path &path);
 
 wgpu::Buffer CreateBuffer(const wgpu::Device &device, wgpu::BufferUsage usage, uint64_t size, const void *data = nullptr);
 wgpu::Buffer CreateVertexBuffer(const wgpu::Device &device, uint64_t size, const void *data = nullptr);
@@ -91,7 +91,11 @@ struct RenderPipelineDescriptor{
   wgpu::MultisampleState multisample;
 };
 
+using dawn::utils::MakePipelineLayout;
 wgpu::RenderPipeline MakeRenderPipeline(const wgpu::Device &device, const utils::RenderPipelineDescriptor &descriptor);
+
+using dawn::utils::MakeBindGroup;
+using dawn::utils::MakeBindGroupLayout;
 
 struct BlendComponent {
   static constexpr wgpu::BlendComponent Replace = {
@@ -127,11 +131,6 @@ struct BlendState {
     .alpha = BlendComponent::Over,
   };
 };
-
-// useful dawn utils (copied over cuz emscripeten dont have)
-using dawn::utils::MakeBindGroup;
-using dawn::utils::MakeBindGroupLayout;
-using dawn::utils::MakePipelineLayout;
 
 } // namespace wgpu::utils
 
