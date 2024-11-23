@@ -1,9 +1,16 @@
 #pragma once
 
-#include "./webgpu.hpp"
+#include "webgpu/webgpu_cpp.h"
+#include "./shader.hpp"
+#include "./buffer.hpp"
+#include "./texture.hpp"
+#include "./pipeline.hpp"
+#include "./bind_group.hpp"
+
+namespace wgpu::utils {
 
 // all device util wrappers
-struct DeviceUtils {
+struct DeviceWrapper {
   wgpu::Device _device;
 
   void SetDevice(const wgpu::Device &device) {
@@ -65,15 +72,16 @@ struct DeviceUtils {
   // Bind Group
   wgpu::BindGroup MakeBindGroup(
     const wgpu::BindGroupLayout& layout,
-    std::initializer_list<dawn::utils::BindingInitializationHelper> entriesInitializer
+    std::initializer_list<wgpu::utils::BindingInitializationHelper> entriesInitializer
   ) const {
     return wgpu::utils::MakeBindGroup(_device, layout, entriesInitializer);
   }
 
   wgpu::BindGroupLayout MakeBindGroupLayout(
-    std::initializer_list<dawn::utils::BindingLayoutEntryInitializationHelper> entriesInitializer
+    std::initializer_list<wgpu::utils::BindingLayoutEntryInitializationHelper> entriesInitializer
   ) const {
     return wgpu::utils::MakeBindGroupLayout(_device, entriesInitializer);
   }
 };
 
+}

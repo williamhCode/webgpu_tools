@@ -29,9 +29,15 @@ if(NOT EMSCRIPTEN)
 endif()
 
 add_library(webgpu_tools STATIC
-  src/webgpu_tools/utils/webgpu.cpp
-  src/webgpu_tools/utils/dawn.cpp
-  src/webgpu_tools/utils/sdl3webgpu.mm
+  src/webgpu_tools/webgpu_utils/bind_group.cpp
+  src/webgpu_tools/webgpu_utils/buffer.cpp
+  src/webgpu_tools/webgpu_utils/init.cpp
+  src/webgpu_tools/webgpu_utils/pipeline.cpp
+  src/webgpu_tools/webgpu_utils/render_pass.cpp
+  src/webgpu_tools/webgpu_utils/shader.cpp
+  src/webgpu_tools/webgpu_utils/texture.cpp
+  src/webgpu_tools/webgpu_utils/
+  src/webgpu_tools/sdl3webgpu.mm
 )
 
 set_target_properties(webgpu_tools PROPERTIES

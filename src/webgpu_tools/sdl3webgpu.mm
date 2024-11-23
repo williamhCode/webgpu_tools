@@ -1,6 +1,6 @@
 #include "SDL3/SDL.h"
-#include "./sdl3webgpu.h"
-#include "./webgpu.hpp"
+#include "./sdl3webgpu.hpp"
+#include "./webgpu_utils.hpp"
 
 #if defined(SDL_PLATFORM_MACOS)
 #include <Cocoa/Cocoa.h>

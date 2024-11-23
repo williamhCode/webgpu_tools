@@ -2,10 +2,9 @@
 
 #include "webgpu/webgpu_cpp.h"
 
-namespace dawn::utils {
+namespace wgpu::utils {
 
-wgpu::PipelineLayout
-MakePipelineLayout(const wgpu::Device& device, std::vector<wgpu::BindGroupLayout> bgls);
+// stolen from dawn/utils
 
 // extern wgpu::ExternalTextureBindingLayout kExternalTextureBindingLayout;
 
@@ -91,6 +90,4 @@ wgpu::BindGroup MakeBindGroup(
   std::initializer_list<BindingInitializationHelper> entriesInitializer
 );
 
-uint32_t GetTexelBlockSizeInBytes(wgpu::TextureFormat textureFormat);
-
-} // namespace dawn::utils
+}
