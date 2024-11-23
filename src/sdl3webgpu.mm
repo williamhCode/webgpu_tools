@@ -13,7 +13,9 @@ wgpu::Surface SDL_GetWGPUSurface(const wgpu::Instance& instance, SDL_Window* win
   assert(false && "dont use this for emscripten");
 #elif defined(SDL_PLATFORM_MACOS)
   {
-    NSWindow *nswindow = (__bridge NSWindow *)SDL_GetPointerProperty(SDL_GetWindowProperties(window), SDL_PROP_WINDOW_COCOA_WINDOW_POINTER, NULL);
+    NSWindow* nswindow = (__bridge NSWindow*)SDL_GetPointerProperty(
+      SDL_GetWindowProperties(window), SDL_PROP_WINDOW_COCOA_WINDOW_POINTER, NULL
+    );
     [nswindow.contentView setWantsLayer:YES];
     id metal_layer = [CAMetalLayer layer];
     [nswindow.contentView setLayer:metal_layer];
