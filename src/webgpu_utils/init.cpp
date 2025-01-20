@@ -12,7 +12,7 @@ static std::string ToString(auto&& obj) {
   return (std::ostringstream() << obj).str();
 }
 
-Adapter RequestAdapter(Instance& instance, const RequestAdapterOptions& options) {
+Adapter RequestAdapter(const Instance& instance, const RequestAdapterOptions& options) {
   wgpu::Adapter adapter;
   instance.WaitAny(
     instance.RequestAdapter(
@@ -33,32 +33,9 @@ Adapter RequestAdapter(Instance& instance, const RequestAdapterOptions& options)
   );
 
   return adapter;
-
-// #if defined(__EMSCRIPTEN__)
-//   auto onAdapterRequestEnded = [](
-//                                  WGPURequestAdapterStatus status, WGPUAdapter adapter,
-//                                  char const* message, void* pUserData
-//                                ) {
-//     UserData& userData = *static_cast<UserData*>(pUserData);
-//     if (status == WGPURequestAdapterStatus_Success) {
-//       userData.adapter = adapter;
-//     } else {
-//       std::cout << "Could not get WebGPU adapter: " << message << "\n";
-//     }
-//     userData.requestEnded = true;
-//   };
-
-//   instance.RequestAdapter(options, onAdapterRequestEnded, &userData);
-
-//   while (!userData.requestEnded) {
-//     emscripten_sleep(100);
-//   }
-//   return userData.adapter;
-// #endif
 }
 
-Device RequestDevice(const Adapter& adapter, const DeviceDescriptor& descriptor) {
-  auto instance = adapter.GetInstance();
+Device RequestDevice(const Instance& instance, const Adapter& adapter, const DeviceDescriptor& descriptor) {
   wgpu::Device device;
   instance.WaitAny(
     adapter.RequestDevice(
@@ -79,29 +56,6 @@ Device RequestDevice(const Adapter& adapter, const DeviceDescriptor& descriptor)
   );
 
   return device;
-
-// #ifdef __EMSCRIPTEN__
-//   auto onDeviceRequestEnded = [](
-//                                 WGPURequestDeviceStatus status, WGPUDevice device,
-//                                 char const* message, void* pUserData
-//                               ) {
-//     UserData& userData = *static_cast<UserData*>(pUserData);
-//     if (status == WGPURequestDeviceStatus_Success) {
-//       userData.device = device;
-//     } else {
-//       std::cout << "Could not get WebGPU adapter: " << message << "\n";
-//     }
-//     userData.requestEnded = true;
-//   };
-
-//   instance.RequestDevice(descriptor, onDeviceRequestEnded, &userData);
-
-//   while (!userData.requestEnded) {
-//     emscripten_sleep(100);
-//   }
-
-//   return userData.device;
-// #endif
 }
 
 // clang-format off

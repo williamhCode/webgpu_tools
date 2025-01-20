@@ -4,9 +4,9 @@
 
 namespace wgpu::utils {
 
-wgpu::Adapter RequestAdapter(wgpu::Instance& instance, const wgpu::RequestAdapterOptions& options);
+wgpu::Adapter RequestAdapter(const wgpu::Instance& instance, const wgpu::RequestAdapterOptions& options);
 
-wgpu::Device RequestDevice(const wgpu::Adapter& adapter, const wgpu::DeviceDescriptor& descriptor);
+wgpu::Device RequestDevice(const wgpu::Instance& instance, const wgpu::Adapter& adapter, const wgpu::DeviceDescriptor& descriptor);
 
 void PrintLimits(const wgpu::Limits& limits);
 

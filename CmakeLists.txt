@@ -3,31 +3,19 @@ enable_language(OBJC)
 
 cmake_minimum_required(VERSION 3.5...3.28)
 
-project(WebGPU_Tools VERSION 1.0.0)
+project(
+  WebGPU_Tools
+  VERSION 1.0.0
+  DESCRIPTION "Utils and dependencies for WebGPU"
+  LANGUAGES C CXX
+)
 
 # dependencies
 add_subdirectory(deps/SDL EXCLUDE_FROM_ALL)
 # add_subdirectory(/Users/williamhou/Documents/Coding/Github/SDL ${CMAKE_CURRENT_BINARY_DIR}/deps/SDL EXCLUDE_FROM_ALL)
 add_subdirectory(deps/glm-1.0.1)
-# add_subdirectory(deps/magic_enum)
 add_subdirectory(deps/stb)
-
-if(NOT EMSCRIPTEN)
-  include(FetchContent)
-  if (CMAKE_BUILD_TYPE MATCHES Debug)
-    FetchContent_Declare(
-      dawn
-      URL https://github.com/williamhCode/dawn-single-lib/releases/download/chromium%2F6800/dawn-osx-universal-relwithdebinfo+assert.tar.gz
-    )
-  else()
-    FetchContent_Declare(
-      dawn
-      URL https://github.com/williamhCode/dawn-single-lib/releases/download/chromium%2F6800/dawn-osx-universal-release.tar.gz
-    )
-  endif()
-  FetchContent_MakeAvailable(dawn)
-  find_package(Dawn CONFIG REQUIRED PATHS ${dawn_SOURCE_DIR})
-endif()
+add_subdirectory(deps/webgpu)
 
 add_library(webgpu_tools STATIC
   src/webgpu_utils/bind_group.cpp
@@ -62,10 +50,10 @@ target_link_libraries(webgpu_tools PUBLIC
   glm
   stb
   # magic_enum::magic_enum
-  dawn::webgpu_dawn
+  webgpu
 )
 
-if (APPLE)
+if(APPLE)
   target_link_libraries(webgpu_tools PUBLIC
     "-framework Cocoa" 
     "-framework IOKit"
@@ -83,8 +71,9 @@ if(EMSCRIPTEN)
   target_link_options(webgpu_tools PUBLIC
     -gsource-map
     -sALLOW_MEMORY_GROWTH
-    -sUSE_WEBGPU
-    -sASYNCIFY
+    # -sASYNCIFY
+    "-sJSPI"
+    # -sUSE_WEBGPU
     # -fexceptions
   )
 

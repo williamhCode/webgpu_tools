@@ -1,34 +1,48 @@
-cmake_minimum_required(VERSION 3.0.0...3.24 FATAL_ERROR)
-project(webgpu-backend-dawn VERSION 1.0.0)
+cmake_minimum_required(VERSION 3.28 FATAL_ERROR)
 
-message(STATUS "Using Dawn backend for WebGPU")
+project(webgpu VERSION 1.0.0)
 
-add_library(webgpu INTERFACE)
+include(FetchContent)
 
 if (EMSCRIPTEN)
+  FetchContent_Declare(
+    dawn
 
-  target_include_directories(webgpu INTERFACE
-    "${CMAKE_CURRENT_SOURCE_DIR}/include-emscripten"
+    DOWNLOAD_COMMAND
+      cd ${PROJECT_SOURCE_DIR}/dawn-src &&
+      git init &&
+      git fetch --depth=1 https://dawn.googlesource.com/dawn chromium/6930 &&
+      git reset --hard FETCH_HEAD
+
+    SOURCE_DIR ${PROJECT_SOURCE_DIR}/dawn-src
   )
 
-  # This is used to advertise the flavor of WebGPU that this zip provides
-  target_compile_definitions(webgpu INTERFACE WEBGPU_BACKEND_EMSCRIPTEN)
+  set(DAWN_FETCH_DEPENDENCIES ON)
+  set(DAWN_EMSCRIPTEN_TOOLCHAIN "/Users/williamhou/Documents/Coding/Github/emscripten")
+
+  FetchContent_MakeAvailable(dawn)
+
+  add_library(webgpu INTERFACE)
+  target_link_libraries(webgpu INTERFACE
+    webgpu_cpp
+  )
 
 else (EMSCRIPTEN)
-  if (NOT XCODE)
-    set(DAWN_FETCH_DIR "${CMAKE_CURRENT_LIST_DIR}/fetch-content")
+  if (CMAKE_BUILD_TYPE MATCHES Debug)
+    FetchContent_Declare(
+      dawn
+      URL https://github.com/williamhCode/dawn-single-lib/releases/download/chromium%2F6800/dawn-osx-universal-relwithdebinfo+assert.tar.gz
+    )
   else()
-    set(DAWN_FETCH_DIR "${CMAKE_CURRENT_LIST_DIR}/fetch-content-xcode")
+    FetchContent_Declare(
+      dawn
+      URL https://github.com/williamhCode/dawn-single-lib/releases/download/chromium%2F6800/dawn-osx-universal-release.tar.gz
+    )
   endif()
+  FetchContent_MakeAvailable(dawn)
 
-  include(cmake/FetchDawn.cmake)
+  find_package(Dawn CONFIG REQUIRED PATHS ${dawn_SOURCE_DIR})
 
-  target_link_libraries(webgpu INTERFACE webgpu_dawn)
-
-  target_compile_definitions(webgpu INTERFACE WEBGPU_BACKEND_DAWN)
-
+  add_library(webgpu INTERFACE)
+  target_link_libraries(webgpu INTERFACE dawn::webgpu_dawn)
 endif (EMSCRIPTEN)
-
-# Does nothing, as this dawn-based distribution of WebGPU is statically linked
-function(target_copy_webgpu_binaries Target)
-endfunction()
