@@ -20,4 +20,12 @@ ShaderModule LoadShaderModule(const Device& device, const std::filesystem::path&
   return device.CreateShaderModule(&descriptor);
 }
 
+ShaderModule LoadShaderModuleSource(const Device& device, const std::string& source) {
+  wgpu::ShaderModuleWGSLDescriptor wgslDesc;
+  wgslDesc.code = source.c_str();
+  wgpu::ShaderModuleDescriptor descriptor;
+  descriptor.nextInChain = &wgslDesc;
+  return device.CreateShaderModule(&descriptor);
+}
+
 }

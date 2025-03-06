@@ -36,8 +36,8 @@ struct VertexBufferLayout {
 struct RenderPipelineDescriptor{
   wgpu::ShaderModule vs;
   wgpu::ShaderModule fs;
-  const std::vector<wgpu::BindGroupLayout>& bgls;
-  const std::vector<wgpu::utils::VertexBufferLayout>& buffers;
+  std::vector<wgpu::BindGroupLayout> bgls;
+  std::vector<wgpu::utils::VertexBufferLayout> buffers;
   const std::vector<wgpu::ColorTargetState>& targets;
   wgpu::PrimitiveState primitive;
   wgpu::DepthStencilState depthStencil;

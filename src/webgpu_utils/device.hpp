@@ -18,6 +18,10 @@ struct DeviceWrapper {
     return wgpu::utils::LoadShaderModule(device, path);
   }
 
+  wgpu::ShaderModule LoadShaderModuleSource(const std::string& source) const {
+    return wgpu::utils::LoadShaderModuleSource(device, source);
+  }
+
   // Buffers
   wgpu::Buffer CreateBuffer(wgpu::BufferUsage usage, uint64_t size, const void *data = nullptr) const {
     return wgpu::utils::CreateBuffer(device, usage, size, data);
