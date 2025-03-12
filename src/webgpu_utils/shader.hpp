@@ -6,7 +6,7 @@
 
 namespace wgpu::utils {
 
-wgpu::ShaderModule LoadShaderModule(const wgpu::Device &device, const std::filesystem::path &path);
+wgpu::ShaderModule LoadShaderModulePath(const wgpu::Device &device, const std::filesystem::path &path);
 wgpu::ShaderModule LoadShaderModuleSource(const Device& device, const std::string& source);
 
 }

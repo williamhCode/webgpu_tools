@@ -14,8 +14,8 @@ struct DeviceWrapper {
   wgpu::Device device;
 
   // Shader
-  wgpu::ShaderModule LoadShaderModule(const std::filesystem::path &path) const {
-    return wgpu::utils::LoadShaderModule(device, path);
+  wgpu::ShaderModule LoadShaderModulePath(const std::filesystem::path &path) const {
+    return wgpu::utils::LoadShaderModulePath(device, path);
   }
 
   wgpu::ShaderModule LoadShaderModuleSource(const std::string& source) const {

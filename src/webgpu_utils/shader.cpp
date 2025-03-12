@@ -4,7 +4,7 @@
 
 namespace wgpu::utils {
 
-ShaderModule LoadShaderModule(const Device& device, const std::filesystem::path& path) {
+ShaderModule LoadShaderModulePath(const Device& device, const std::filesystem::path& path) {
   std::ifstream file(path);
   if (!file.is_open()) {
     throw std::runtime_error("Could not open shader file" + path.string());
@@ -13,18 +13,12 @@ ShaderModule LoadShaderModule(const Device& device, const std::filesystem::path&
   buffer << file.rdbuf();
   auto source = buffer.str();
 
-  wgpu::ShaderModuleWGSLDescriptor wgslDesc;
-  wgslDesc.code = source.c_str();
-  wgpu::ShaderModuleDescriptor descriptor;
-  descriptor.nextInChain = &wgslDesc;
-  return device.CreateShaderModule(&descriptor);
+  return LoadShaderModuleSource(device, source);
 }
 
 ShaderModule LoadShaderModuleSource(const Device& device, const std::string& source) {
-  wgpu::ShaderModuleWGSLDescriptor wgslDesc;
-  wgslDesc.code = source.c_str();
-  wgpu::ShaderModuleDescriptor descriptor;
-  descriptor.nextInChain = &wgslDesc;
+  wgpu::ShaderModuleWGSLDescriptor wgslDesc({.code = source.c_str()});
+  wgpu::ShaderModuleDescriptor descriptor{.nextInChain = &wgslDesc};
   return device.CreateShaderModule(&descriptor);
 }
 
