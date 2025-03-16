@@ -16,13 +16,7 @@ add_subdirectory(deps/SDL EXCLUDE_FROM_ALL)
 add_subdirectory(deps/glm-1.0.1)
 add_subdirectory(deps/stb)
 add_subdirectory(deps/webgpu)
-
-set(SLANG_ROOT ${PROJECT_SOURCE_DIR}/deps/slang-2025.6.1)
-add_library(slang SHARED IMPORTED)
-set_target_properties(slang PROPERTIES
-  IMPORTED_LOCATION "${SLANG_ROOT}/lib/libslang.dylib"
-  INTERFACE_INCLUDE_DIRECTORIES "${SLANG_ROOT}/include"
-)
+add_subdirectory(deps/slang)
 
 add_library(webgpu_tools STATIC
   src/slang_utils/context.cpp
