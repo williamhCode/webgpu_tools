@@ -2,13 +2,14 @@
 
 #include "webgpu/webgpu_cpp.h"
 #include <vector>
+#include <optional>
 
 namespace wgpu::utils {
 
 struct RenderPassDescriptor : public wgpu::RenderPassDescriptor{
   RenderPassDescriptor(
     std::vector<wgpu::RenderPassColorAttachment> colorAttachments = {},
-    wgpu::RenderPassDepthStencilAttachment depthStencilAttachment = {}
+    std::optional<wgpu::RenderPassDepthStencilAttachment> depthStencilAttachment = {}
   );
   ~RenderPassDescriptor() = default;
 
