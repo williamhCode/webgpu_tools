@@ -17,8 +17,9 @@ SlangContext::SlangContext(fs::path _includeDir) {
 
   includeDir = std::move(_includeDir);
   searchPaths.push_back(includeDir.c_str());
+}
 
-  // remove all .slang-module files in includeDir to recompile modules
+void SlangContext::ClearModuleFiles() {
   for (const auto& entry : fs::directory_iterator(includeDir)) {
     if (entry.path().extension() == ".slang-module") {
       fs::remove(entry.path());

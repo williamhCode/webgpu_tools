@@ -13,7 +13,11 @@ struct SlangContext {
   std::filesystem::path includeDir;
   std::vector<const char*> searchPaths;
 
+  SlangContext() = default;
   SlangContext(std::filesystem::path includeDir);
+
+  // remove all .slang-module files in includeDir to recompile modules
+  void ClearModuleFiles();
 
   // compiles a module and saves a .slang-module file to the includeDir
   void CompileModuleObject(

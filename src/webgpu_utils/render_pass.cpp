@@ -1,19 +1,19 @@
+#include <utility>
+
 #include "./render_pass.hpp"
 
 namespace wgpu::utils {
 
 RenderPassDescriptor::RenderPassDescriptor(
   std::vector<wgpu::RenderPassColorAttachment> colorAttachments,
-  wgpu::RenderPassDepthStencilAttachment depthStencilAttachment
-) : cColorAttachments(std::move(colorAttachments)) {
+  std::optional<wgpu::RenderPassDepthStencilAttachment> depthStencilAttachment
+)
+    : cColorAttachments(std::move(colorAttachments)) {
   colorAttachmentCount = cColorAttachments.size();
   this->colorAttachments = cColorAttachments.data();
-
-  if (depthStencilAttachment.view.Get() != nullptr) {
-    cDepthStencilAttachmentInfo = depthStencilAttachment;
+  if (depthStencilAttachment.has_value()) {
+    cDepthStencilAttachmentInfo = depthStencilAttachment.value();
     this->depthStencilAttachment = &cDepthStencilAttachmentInfo;
-  } else {
-    this->depthStencilAttachment = nullptr;
   }
 }
 
