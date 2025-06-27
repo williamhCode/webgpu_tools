@@ -21,10 +21,10 @@ void WriteTexture(
 ) {
   wgpu::Extent3D size{_size.x, _size.y, _size.z};
   auto texelBlockSize = GetTexelBlockSizeInBytes(texture.GetFormat());
-  ImageCopyTexture destination{
+  TexelCopyTextureInfo destination{
     .texture = texture,
   };
-  TextureDataLayout dataLayout{
+  TexelCopyBufferLayout dataLayout{
     .bytesPerRow = size.width * texelBlockSize,
     .rowsPerImage = size.height,
   };

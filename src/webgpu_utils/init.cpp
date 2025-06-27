@@ -82,7 +82,6 @@ void PrintLimits(const wgpu::Limits &limits) {
   std::println(" - maxBufferSize: {}", limits.maxBufferSize);
   std::println(" - maxVertexAttributes: {}", limits.maxVertexAttributes);
   std::println(" - maxVertexBufferArrayStride: {}", limits.maxVertexBufferArrayStride);
-  std::println(" - maxInterStageShaderComponents: {}", limits.maxInterStageShaderComponents);
   std::println(" - maxInterStageShaderVariables: {}", limits.maxInterStageShaderVariables);
   std::println(" - maxColorAttachments: {}", limits.maxColorAttachments);
   std::println(" - maxColorAttachmentBytesPerSample: {}", limits.maxColorAttachmentBytesPerSample);
