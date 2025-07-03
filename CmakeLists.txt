@@ -73,8 +73,8 @@ if(EMSCRIPTEN)
   target_link_options(webgpu_tools PUBLIC
     -gsource-map
     -sALLOW_MEMORY_GROWTH
-    # -sASYNCIFY
-    "-sJSPI"
+    -sASYNCIFY
+    # -sJSPI
     # -sUSE_WEBGPU
     # -fexceptions
   )

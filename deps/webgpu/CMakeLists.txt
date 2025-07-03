@@ -5,27 +5,22 @@ project(webgpu VERSION 1.0.0)
 include(FetchContent)
 
 if (EMSCRIPTEN)
-  # build from source if emscripten (use dawn's emdawnwebgpu fork for API parity)
-  FetchContent_Declare(
-    dawn
+  add_library(webgpu INTERFACE)
 
-    DOWNLOAD_COMMAND
-      cd ${PROJECT_SOURCE_DIR}/dawn-src &&
-      git init &&
-      git fetch --depth=1 https://dawn.googlesource.com/dawn chromium/7262 &&
-      git reset --hard FETCH_HEAD
+  set(EMDAWNWEBGPU_DIR "${PROJECT_SOURCE_DIR}/emdawnwebgpu_pkg")
 
-    # prevent multiple copies for debug/release
-    SOURCE_DIR ${PROJECT_SOURCE_DIR}/dawn-src
+  target_compile_options(webgpu INTERFACE
+    "--use-port=${EMDAWNWEBGPU_DIR}/emdawnwebgpu.port.py"
   )
 
-  set(DAWN_FETCH_DEPENDENCIES ON)
-  set(DAWN_EMSCRIPTEN_TOOLCHAIN "/Users/williamhou/Documents/Coding/Github/emscripten")
+  target_link_options(webgpu INTERFACE
+    "--use-port=${EMDAWNWEBGPU_DIR}/emdawnwebgpu.port.py"
+  )
 
-  FetchContent_MakeAvailable(dawn)
-
-  add_library(webgpu INTERFACE)
-  target_link_libraries(webgpu INTERFACE webgpu_cpp)
+  target_include_directories(webgpu INTERFACE
+    "${EMDAWNWEBGPU_DIR}/webgpu/include"
+    "${EMDAWNWEBGPU_DIR}/webgpu_cpp/include"
+  )
 
 else (EMSCRIPTEN)
   if (CMAKE_BUILD_TYPE MATCHES Debug)

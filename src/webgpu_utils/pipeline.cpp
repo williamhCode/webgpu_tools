@@ -48,8 +48,8 @@ RenderPipeline MakeRenderPipeline(
     }
 
     buffers.push_back({
-      .arrayStride = buffer.arrayStride,
       .stepMode = buffer.stepMode,
+      .arrayStride = buffer.arrayStride,
       .attributeCount = attributes.size(),
       .attributes = attributes.data(),
     });

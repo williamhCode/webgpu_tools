@@ -6,23 +6,21 @@
 
 namespace wgpu::utils {
 
-using namespace wgpu;
-
 static std::string ToString(auto&& obj) {
   return (std::ostringstream() << obj).str();
 }
 
 Adapter RequestAdapter(const Instance& instance, const RequestAdapterOptions& options) {
-  wgpu::Adapter adapter;
+  Adapter adapter;
   instance.WaitAny(
     instance.RequestAdapter(
-      &options, wgpu::CallbackMode::WaitAnyOnly,
+      &options, CallbackMode::WaitAnyOnly,
       [](
-        wgpu::RequestAdapterStatus status, wgpu::Adapter result,
-        wgpu::StringView message, wgpu::Adapter* userdata
+        RequestAdapterStatus status, Adapter result, StringView message,
+        Adapter* userdata
       ) {
-        if (status != wgpu::RequestAdapterStatus::Success) {
-          std::println("Could not get WebGPU adapter: {}", message.data);
+        if (status != RequestAdapterStatus::Success) {
+          std::println("Could not get WebGPU adapter: {}", std::string_view(message));
           return;
         }
         *userdata = std::move(result);
@@ -35,17 +33,18 @@ Adapter RequestAdapter(const Instance& instance, const RequestAdapterOptions& op
   return adapter;
 }
 
-Device RequestDevice(const Instance& instance, const Adapter& adapter, const DeviceDescriptor& descriptor) {
-  wgpu::Device device;
+Device RequestDevice(
+  const Instance& instance, const Adapter& adapter, const DeviceDescriptor& descriptor
+) {
+  Device device;
   instance.WaitAny(
     adapter.RequestDevice(
-      &descriptor, wgpu::CallbackMode::WaitAnyOnly,
+      &descriptor, CallbackMode::WaitAnyOnly,
       [](
-        wgpu::RequestDeviceStatus status, wgpu::Device result, wgpu::StringView message,
-        wgpu::Device* userdata
+        RequestDeviceStatus status, Device result, StringView message, Device* userdata
       ) {
-        if (status != wgpu::RequestDeviceStatus::Success) {
-          std::println("Could not get WebGPU device: ", message.data);
+        if (status != RequestDeviceStatus::Success) {
+          std::println("Could not get WebGPU device: {}", std::string_view(message));
           return;
         }
         *userdata = std::move(result);
@@ -59,7 +58,7 @@ Device RequestDevice(const Instance& instance, const Adapter& adapter, const Dev
 }
 
 // clang-format off
-void PrintLimits(const wgpu::Limits &limits) {
+void PrintLimits(const Limits &limits) {
   std::println(" - maxTextureDimension1D: {}", limits.maxTextureDimension1D);
   std::println(" - maxTextureDimension2D: {}", limits.maxTextureDimension2D);
   std::println(" - maxTextureDimension3D: {}", limits.maxTextureDimension3D);
@@ -106,4 +105,4 @@ void PrintSurfaceCapabilities(const SurfaceCapabilities& config) {
   }
 }
 
-}
+} // namespace wgpu::utils

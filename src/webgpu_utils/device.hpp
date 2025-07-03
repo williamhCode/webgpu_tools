@@ -14,7 +14,7 @@ struct DeviceWrapper {
   wgpu::Device device;
 
   // Shader
-  wgpu::ShaderModule LoadShaderModulePath(const std::filesystem::path &path) const {
+  wgpu::ShaderModule LoadShaderModulePath(const std::filesystem::path& path) const {
     return wgpu::utils::LoadShaderModulePath(device, path);
   }
 
@@ -23,32 +23,32 @@ struct DeviceWrapper {
   }
 
   // Buffers
-  wgpu::Buffer CreateBuffer(wgpu::BufferUsage usage, uint64_t size, const void *data = nullptr) const {
+  wgpu::Buffer CreateBuffer(wgpu::BufferUsage usage, uint64_t size, const void* data = nullptr) const {
     return wgpu::utils::CreateBuffer(device, usage, size, data);
   }
 
-  wgpu::Buffer CreateVertexBuffer(uint64_t size, const void *data = nullptr) const {
+  wgpu::Buffer CreateVertexBuffer(uint64_t size, const void* data = nullptr) const {
     return wgpu::utils::CreateVertexBuffer(device, size, data);
   }
 
-  wgpu::Buffer CreateIndexBuffer(uint64_t size, const void *data = nullptr) const {
+  wgpu::Buffer CreateIndexBuffer(uint64_t size, const void* data = nullptr) const {
     return wgpu::utils::CreateIndexBuffer(device, size, data);
   }
 
-  wgpu::Buffer CreateUniformBuffer(uint64_t size, const void *data = nullptr) const {
+  wgpu::Buffer CreateUniformBuffer(uint64_t size, const void* data = nullptr) const {
     return wgpu::utils::CreateUniformBuffer(device, size, data);
   }
 
-  wgpu::Buffer CreateStorageBuffer(uint64_t size, const void *data = nullptr) const {
+  wgpu::Buffer CreateStorageBuffer(uint64_t size, const void* data = nullptr) const {
     return wgpu::utils::CreateStorageBuffer(device, size, data);
   }
 
   // Textures
-  void WriteTexture(const wgpu::Texture &texture, glm::uvec2 size, const void *data) const {
+  void WriteTexture(const wgpu::Texture& texture, glm::uvec2 size, const void* data) const {
     wgpu::utils::WriteTexture(device, texture, size, data);
   }
 
-  void WriteTexture(const wgpu::Texture &texture, glm::uvec3 size, const void *data) const {
+  void WriteTexture(const wgpu::Texture& texture, glm::uvec3 size, const void* data) const {
     wgpu::utils::WriteTexture(device, texture, size, data);
   }
 
